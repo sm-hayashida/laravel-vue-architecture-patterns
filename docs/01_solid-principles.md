@@ -242,3 +242,105 @@ class OrderController extends Controller
 |MVC|Modelにifが積み重なりやすい（違反しやすい）|
 |Onion|Domain Serviceをinterface + 実装で分離|
 |Clean|Interface Adapterがポートを実装、UseCaseは抽象に依存|
+
+## L - Liskov Substitution Principle(リスコフの置換原則)
+### 一言で言うと
+**子クラス（具象）は親クラス（抽象）の性質を壊してはいけないと言う原則**
+**抽象（インターフェース）を使っている側が、その具体的な中身を知らなくても、どれに置き換えても正しく動くべき**
+
+### なぜ必要か
+**「RepositoryInterface を使っているのに、特定の DB 実装の時だけ例外を吐く」
+「親クラスでは true を返していたのに、子クラスでは勝手に nullを返す」
+といったことが起きると、呼び出し側がいちいち中身を判定しなければならず、
+ポリモーフィズムが壊れるため。**
+
+### Laravelでの悪い例
+```php
+interface StockRepository {
+      public function find(int $id): Stock;
+  }
+
+  class DatabaseStockRepository implements StockRepository {
+      public function find(int $id): Stock {
+          return Stock::findOrFail($id); // 見つからなければ例外を投げる
+      }
+  }
+
+  class MockStockRepository implements StockRepository {
+      public function find(int $id): ?Stock {
+          return null; // インターフェースの規約を無視して nullable に変えてしまう
+      }
+  }
+```
+**問題点：StockRepositoryを使っているUseCaseは、Stock型が帰って来ると期待しているのに、Mockに差し替えた瞬間にnullで落ちる**
+### 改善の方向
+- インターフェース（抽象）で定義した方宣言、引数の数、例外の型を厳守する。
+- 事前条件（引数の制約）を強めない、事後条件（戻り値の制約）を弱めない。
+
+
+### パターン比較での位置付け
+|パターン|  LSPの扱い|
+|-------|--------|
+|MVC|Eloquent Modelを継承しすぎると、メソッドを上書きして振る舞いを壊しやすい。|
+|Onion/Clean|Interfaceを厳格に定義し、具象（DB↔︎Mock）の差し替えを安全に行えるようにする。|
+
+## I - Interface Segregation Principle(インターフェース分離の原則)
+
+### 一言で言うと
+**クライアントが利用しないメソッドに依存することを強制してはいけない。**
+**巨大なインターフェース一つより、小さなインターフェース複数**
+
+### なぜ必要か
+**一つのインターフェースに「読み取り・書き込み・削除・集計」を詰め込みすぎると、読み取りしかないクラスまで「削除」メソッドの実装を強要されたり、削除ロジックの変更の影響を受けたりするため。**
+
+### Laravelでの悪い例
+```php
+interface ProductService {
+      public function list();
+      public function updatePrice(int $id, int $price);
+      public function delete(int $id);
+      public function calculateTax(int $price); // 計算ロジックまで入っている
+  }
+
+  class ProductListController {
+      public function __construct(private ProductService $service) {}
+      // 一覧を表示したいだけなのに、更新や削除メソッドを持つ Service に依存している
+  }
+```
+### 改善の方向
+- 役割ごとにインターフェースを分ける。
+- 例えば、参照ようのProdactQueryと、更新ようのProdactCommandに分割する。
+
+### パターン比較での位置付け
+|パターン| DIPの扱い|
+|-------|--------|
+|MVC|Eloquentは巨大なインターフェース（Active Recode）。不要なメソッドも全て公開されている。|
+|Onion|Repositoryはドメインが必要なメソッドだけに絞り、必要最低限の依存を作る。|
+|Clean|Input Port/Output PortをUseCaseごとに定義し、必要な情報だけに絞る。|
+
+## D - Dependency inversion Principle(依存性逆転の原則)
+### 一言で言うと
+**上位モジュールは下位モジュールに依存しなくてはならない。両者は抽象に依存すべき。**
+**具体的な詳細(DB／Framework／API)ではなく、抽象（Interface）に依存せよ。**
+
+### なぜ必要か
+**UseCase（ビジネスロジック）が直接Eloquent（DB）に依存すると、DBを変えたい時やテストしたいときに、UseCaseまで書き換える必要がある。
+これを「逆転」させて、UseCaseは「Interface（抽象）」に依存し、DB（詳細）がそのInterfaceを実装するようにするため。**
+
+### Laravel での例（Service Container を活用）
+
+```php
+// app/Providers/AppServiceProvider.php
+  public function register() {
+      // 「抽象」に対して「具象」を紐づける
+      $this->app->bind(StockRepositoryInterface::class, EloquentStockRepository::class);
+  }
+```
+
+### パターン比較での位置付け
+|パターン| DIPの扱い|
+|-------|--------|
+|MVC|Controller → Model（DB）と言う直接の依存。DIPを使わず密結合になりやすい。|
+|Onion|外側の層（Infrastructure）が内側の層（Domain Interface）に依存する。|
+|Clean|全ての依存が内側（Entities/UseCases）に向かう。Frameworksは一番外側。|
+
