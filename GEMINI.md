@@ -31,9 +31,10 @@
 
 ## 進捗管理
 
-進捗は `CLAUDE.md` の「進捗ログ」と同期して管理すること。
+進捗は `AGENTS.md` の「進捗ログ」と同期して管理すること。
 
 ---
 
-## 本日のタスク (Day 9)
-- [x] Vue Composables と フロントエンドの責務を `docs/05_vue-composables.md` にまとめる。
+## 本日のタスク (Day 10)
+- [x] Pattern 1 の Laravel 10 初期構成を `pattern1-mvc/` に作成する。
+- [x] 在庫管理用の `products` / `stock_movements` migration を追加する。

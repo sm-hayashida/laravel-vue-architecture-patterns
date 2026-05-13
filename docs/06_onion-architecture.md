@@ -50,3 +50,36 @@
 ---
 **本プロジェクトの方針:**
 Pattern 2 では、コントローラーを「薄い玄関口」にし、ビジネスロジックを「役者（ドメインモデル）」に、手順を「脚本（アプリケーションサービス）」に徹底して分離する。
+
+---
+
+## Day 14: Domain層から始める理由
+
+Pattern 2 では、最初に `pattern2-onion/app/Domain/` を作成し、Laravel や Eloquent から独立した PHP クラスとして在庫ルールを表現した。
+
+Pattern 1 では、在庫を直接調整できるかどうかは Controller、在庫数がマイナスにならないことは Eloquent Model に置いていた。これは小さく作るには速いが、業務ルールの場所が分散する。
+
+Onion Architecture では、まず中心に次のようなドメイン概念を置く。
+
+- `Product`: 在庫操作を持つ集約ルート。
+- `StockQuantity`: 0 未満を許可しない現在庫数。
+- `MovementQuantity`: 0 以下を許可しない入出庫数量。
+- `Sku` / `ProductName` / `Money`: プリミティブ値をそのまま渡さず、意味と制約を持たせる値オブジェクト。
+
+この段階では DB 保存や HTTP レスポンスは扱わない。外側の Application / Infrastructure は後から追加し、依存方向を「外から内へ」に保つ。
+
+---
+
+## Day 15: Domain Service と Repository Interface
+
+Day 15 では、Domain 層に `StockAdjustmentPolicy` と `ProductRepositoryInterface` を追加した。
+
+`StockAdjustmentPolicy` は Domain Service として、「直接在庫調整は manager だけができる」というルールを持つ。このルールは `Product` 自身の状態だけでは判断できない。操作する人の役割が必要になるため、Entity に押し込むより Domain Service として独立させた方が責務が明確になる。
+
+`ProductRepositoryInterface` は、Product 集約を保存・取得するための約束である。ここで重要なのは、Interface は Domain 側に置き、Eloquent の実装は外側の Infrastructure 側に置くこと。
+
+```text
+Application Service -> ProductRepositoryInterface <- EloquentProductRepository
+```
+
+この形にすると、Application Service は「Product を保存できるもの」に依存するだけで、MySQL や Eloquent の詳細を知らずに済む。これが DIP によって Domain を外側の技術詳細から守る、という意味になる。
