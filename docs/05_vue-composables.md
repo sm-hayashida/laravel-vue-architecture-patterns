@@ -61,3 +61,20 @@ UI コンポーネントのテストはレンダリングが伴うため重く�
 
 **本プロジェクトの方針:**
 Day 12 以降の実装フェーズでは、まず Pattern 1 で「コンポーネントにロジックが混在する不透明さ」を体験し、その後の Pattern 2/3 で Composable を用いて「UI を純粋なプレゼンテーションに保つ」美しさを実装を通じて検証する。
+
+## Day 18b: Pattern 2 での Composable 実装
+
+Pattern 2 では、`resources/js/composables/useInventoryProducts.ts` を追加し、在庫画面の状態管理と API 呼び出しを Vue component から分離した。
+
+```text
+InventoryApp.vue
+  -> useInventoryProducts
+      -> productApi.ts
+          -> /api/products
+```
+
+Pattern 1 の `InventoryApp.vue` は、画面表示、form state、axios 呼び出し、error extraction、loading、message を全部持っていた。これは小さい画面では速いが、API 仕様変更や別画面での再利用が必要になると component が肥大化しやすい。
+
+Pattern 2 では、`InventoryApp.vue` は composable から返された `products`、`productForm`、`stockForm`、`submitProduct`、`submitStockUpdate` などを使うだけにした。API endpoint や error response の扱いは component から隠れる。
+
+この分離によって、frontend でも backend と同じように「UI は UI」「操作手順は Composable」「HTTP 詳細は API module」という責務分離を確認できる。

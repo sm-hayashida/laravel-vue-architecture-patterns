@@ -188,3 +188,228 @@ pattern2-onion/app/Domain/
 - Run PHP syntax checks.
 - Search the Domain layer for Laravel / Eloquent imports.
 - Perform a small behavior check for the stock adjustment policy.
+
+## Day 16: Pattern 2 Application Service
+
+### Application Boundary
+- Add `pattern2-onion/app/Application/` as the layer that coordinates use of Domain objects.
+- Application code may depend on Domain Entity, Value Object, Domain Service, and Repository Interface.
+- Application code must not depend on Eloquent, Laravel Request / Response, DB facade, Controller, or Vue.
+
+### Directory Additions
+```text
+pattern2-onion/app/Application/
+├── Exceptions/
+│   └── InventoryApplicationException.php
+└── Services/
+    └── ProductInventoryService.php
+```
+
+### Responsibility Placement
+- `ProductInventoryService`:
+  - creates Product aggregates after checking SKU uniqueness through `ProductRepositoryInterface`.
+  - loads Product aggregates by `ProductId`.
+  - calls `Product::increaseStock()`, `Product::decreaseStock()`, or `Product::adjustStock()`.
+  - calls `StockAdjustmentPolicy::assertCanAdjust()` before direct adjustment.
+  - saves changed Product aggregates through `ProductRepositoryInterface`.
+- `InventoryApplicationException`:
+  - represents application workflow failures that are not pure domain invariants, such as product not found or duplicate SKU.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 1 MVC placed orchestration, validation, permission branching, transaction control, and response shaping in `ProductController`.
+- Pattern 2 Application Service owns only the application flow: fetch aggregate, ask Domain to apply rules, save aggregate.
+- Clean later should split this further into use-case-specific Interactors and input/output ports.
+
+### Verification
+- Run PHP syntax checks for Domain and Application classes.
+- Search Pattern 2 for Laravel / Eloquent imports to confirm Onion dependency direction is still preserved.
+
+## Day 17: Pattern 2 Infrastructure Eloquent Repository
+
+### Application Boundary
+- Add `pattern2-onion/app/Infrastructure/` as the outer layer.
+- Infrastructure may depend on Domain interfaces and Value Objects.
+- Domain and Application must not import Infrastructure classes.
+
+### Directory Additions
+```text
+pattern2-onion/app/Infrastructure/
+├── Persistence/
+│   └── Eloquent/
+│       └── Models/
+│           ├── ProductRecord.php
+│           └── StockMovementRecord.php
+└── Repositories/
+    └── EloquentProductRepository.php
+```
+
+### Responsibility Placement
+- `ProductRecord` and `StockMovementRecord`:
+  - represent database tables through Eloquent.
+  - contain persistence mapping details only.
+- `EloquentProductRepository`:
+  - implements `ProductRepositoryInterface`.
+  - fetches and saves database rows.
+  - maps Eloquent records to `Product`, `ProductId`, `Sku`, `ProductName`, `StockQuantity`, and `Money`.
+  - converts `Money` cents to database decimal strings without using floats.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 1 MVC used the Eloquent `Product` model directly as both persistence model and business logic holder.
+- Pattern 2 Infrastructure keeps Eloquent at the outer layer and translates it into Domain objects.
+- Clean later should treat a similar persistence implementation as a gateway adapter behind use-case ports.
+
+### Verification
+- Run PHP syntax checks for Pattern 2.
+- Search Domain and Application for Infrastructure / Eloquent imports.
+- Search Infrastructure to confirm it depends inward on Domain interfaces rather than the reverse.
+
+## Day 18a: Pattern 2 Controller / DI / API Connection
+
+### Application Boundary
+- Add HTTP delivery code as an outer layer.
+- HTTP Controller may depend on Application Service, Domain Value Objects, and Domain enums for input conversion.
+- HTTP Controller must not call Eloquent records or repositories directly.
+- Service provider may bind Domain repository interfaces to Infrastructure implementations.
+
+### Directory Additions
+```text
+pattern2-onion/
+├── app/
+│   ├── Http/
+│   │   └── Controllers/
+│   │       └── ProductController.php
+│   └── Providers/
+│       └── AppServiceProvider.php
+└── routes/
+    └── api.php
+```
+
+### API Contract
+- `GET /products`
+  - returns `data: ProductResponse[]`.
+- `POST /products`
+  - request: `sku`, `name`, `stock_quantity`, `price_amount_in_cents`.
+  - response: `201` with `data: ProductResponse`.
+- `POST /products/{productId}/stock`
+  - request: `type`, `quantity`, `operator_role`.
+  - response: `200` with `data: ProductResponse`.
+
+`ProductResponse`:
+```json
+{
+  "id": 1,
+  "sku": "SKU-001",
+  "name": "Sample Product",
+  "stock_quantity": 10,
+  "price_amount_in_cents": 1200
+}
+```
+
+### Responsibility Placement
+- `ProductController`:
+  - validates HTTP request shape.
+  - converts primitives into `Sku`, `ProductName`, `StockQuantity`, `MovementQuantity`, `Money`, `ProductId`, and enums.
+  - delegates use of Domain rules to `ProductInventoryService`.
+  - converts Domain `Product` to JSON.
+- `AppServiceProvider`:
+  - binds `ProductRepositoryInterface` to `EloquentProductRepository`.
+- `ProductInventoryService::listProducts()`:
+  - provides a frontend-friendly listing flow without exposing Infrastructure to Controller.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 1 Controller owned permission branching and called Eloquent Model behavior directly.
+- Pattern 2 Controller converts HTTP input and delegates; permission and stock rules stay in Domain/Application.
+- Clean later should make input/output ports and presenters more explicit than this Onion-style controller.
+
+### Verification
+- Run PHP syntax checks for Pattern 2.
+- Search Domain and Application for Laravel HTTP / Infrastructure imports.
+- Search Controller for direct `ProductRecord` / Eloquent Repository usage.
+
+## Day 18b: Pattern 2 Vue Composable Separation
+
+### Frontend Boundary
+- Add `pattern2-onion/resources/js/` as the frontend comparison layer.
+- Keep API details in `resources/js/api/`.
+- Keep reusable stateful workflow logic in `resources/js/composables/`.
+- Keep the Vue component focused on rendering and event wiring.
+
+### Directory Additions
+```text
+pattern2-onion/resources/js/
+├── api/
+│   └── productApi.ts
+├── components/
+│   └── InventoryApp.vue
+├── composables/
+│   └── useInventoryProducts.ts
+├── types/
+│   └── product.ts
+└── app.ts
+```
+
+### Responsibility Placement
+- `types/product.ts`:
+  - owns API-facing TypeScript contracts for Product, create payload, update payload, movement type, and operator role.
+- `api/productApi.ts`:
+  - owns axios calls and endpoint paths.
+- `useInventoryProducts.ts`:
+  - owns reactive state, form state, loading state, message state, API orchestration, and error extraction.
+- `InventoryApp.vue`:
+  - renders the form, summary, and table.
+  - calls composable commands from UI events.
+  - does not import axios.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 1 kept HTTP calls, form state, message handling, and rendering in one component.
+- Pattern 2 separates API/state workflow from UI so the frontend mirrors the backend responsibility split.
+- Pattern 3 later can push this further with stricter input/output types shared around use-case-oriented endpoints.
+
+### Verification
+- Run text checks to confirm `InventoryApp.vue` does not import axios.
+- Run syntax-oriented checks available without installing Pattern 2 frontend dependencies.
+- Document that frontend build is not run until Pattern 2 has a full npm scaffold.
+
+## Day 19: Pattern 2 Unit Tests
+
+### Test Boundary
+- Add a small PHPUnit setup inside `pattern2-onion/`.
+- Keep tests focused on pure Domain and Application behavior.
+- Avoid Laravel TestCase, RefreshDatabase, HTTP requests, Eloquent records, and migrations.
+
+### Directory Additions
+```text
+pattern2-onion/
+├── composer.json
+├── phpunit.xml
+└── tests/
+    ├── bootstrap.php
+    ├── Support/
+    │   └── InMemoryProductRepository.php
+    └── Unit/
+        ├── Application/
+        │   └── ProductInventoryServiceTest.php
+        └── Domain/
+            └── ProductTest.php
+```
+
+### Responsibility Placement
+- `ProductTest`:
+  - verifies `Product` stock operations and Domain exceptions.
+  - verifies `StockAdjustmentPolicy` without HTTP role strings or Controller branching.
+- `ProductInventoryServiceTest`:
+  - verifies application flow using `InMemoryProductRepository`.
+  - checks SKU duplication before save, missing product handling, and stock operation persistence calls.
+- `InMemoryProductRepository`:
+  - implements the Domain repository contract only for tests.
+  - lets Application Service tests replace Infrastructure without changing production code.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 1 proves behavior through Feature Tests because rules are attached to Controller, Eloquent, transactions, and database rows.
+- Pattern 2 can test stock rules and orchestration directly because Domain/Application depend on contracts and pure PHP objects.
+- Pattern 3 later should make test boundaries even more use-case-specific with Input/Output Ports and Presenter-facing output contracts.
+
+### Verification
+- Run Pattern 2 PHPUnit tests when dependencies are available.
+- Run PHP syntax checks for added test and support files.
+- Confirm no production code changed for Day 19.

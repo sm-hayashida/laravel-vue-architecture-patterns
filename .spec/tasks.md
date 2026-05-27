@@ -64,3 +64,57 @@
 - [x] Update Pattern 2 README, docs, and progress log.
 - [x] Run syntax and dependency checks.
 - [x] Review changes before handoff.
+
+## Day 16: Pattern 2 Application Service
+
+- [x] Confirm Day 16 scope from schedule and Pattern 2 state.
+- [x] Add Day 16 requirements and design.
+- [x] Add Application exception for workflow-level failures.
+- [x] Add Product inventory Application Service.
+- [x] Update Pattern 2 README, docs, and progress log.
+- [x] Run syntax and dependency checks.
+- [x] Review changes before handoff.
+
+## Day 17: Pattern 2 Infrastructure Eloquent Repository
+
+- [x] Confirm Day 17 scope and current Pattern 2 structure.
+- [x] Add Day 17 requirements and design.
+- [x] Add Infrastructure Eloquent record models.
+- [x] Add Eloquent Product Repository implementation.
+- [x] Update Pattern 2 README, docs, and progress log.
+- [x] Run syntax and dependency checks.
+- [x] Review changes before handoff.
+
+## Day 18a: Pattern 2 Controller / DI / API Connection
+
+- [x] Confirm API needs before Vue Composable work.
+- [x] Add Day 18a requirements and design.
+- [x] Add list support to repository contract and Application Service.
+- [x] Add Laravel service provider binding.
+- [x] Add Pattern 2 Product Controller and API routes.
+- [x] Update Pattern 2 README, docs, and progress log.
+- [x] Run syntax and dependency checks.
+- [x] Review changes before handoff.
+
+## Day 18b: Pattern 2 Vue Composable Separation
+
+- [x] Confirm Pattern 1 inline Vue responsibility placement.
+- [x] Add Day 18b requirements and design.
+- [x] Add TypeScript API contracts.
+- [x] Add product API module.
+- [x] Add inventory composable.
+- [x] Add thin Vue component using the composable.
+- [x] Update Pattern 2 README, docs, and progress log.
+- [x] Run available checks.
+- [x] Review changes before handoff.
+
+## Day 19: Pattern 2 Unit Tests And Pattern 1 Comparison
+
+- [x] Confirm Day 19 scope from schedule and Pattern 2 state.
+- [x] Add Day 19 requirements and design.
+- [x] Add lightweight PHPUnit configuration for Pattern 2.
+- [x] Add Domain unit tests.
+- [x] Add Application Service unit tests with an in-memory repository.
+- [x] Update Pattern 2 README, docs, and progress log.
+- [x] Run available verification commands.
+- [x] Review changes before handoff.

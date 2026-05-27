@@ -127,6 +127,11 @@ laravel-vue-architecture-patterns/
 | Day 13 | 2026/05/13 | 完了 | Pattern 1 の変更しにくさ・テストしにくさを振り返り |
 | Day 14 | 2026/05/13 | 完了 | Pattern 2 の Domain 層として Entity / Value Object を追加 |
 | Day 15 | 2026/05/13 | 完了 | Pattern 2 の Domain Service と Repository Interface を追加 |
+| Day 16 | 2026/05/19 | 完了 | Pattern 2 の Application Service を追加 |
+| Day 17 | 2026/05/19 | 完了 | Pattern 2 の Infrastructure Eloquent Repository を追加 |
+| Day 18a | 2026/05/19 | 完了 | Pattern 2 の Controller / DI / API 接続を追加 |
+| Day 18b | 2026/05/19 | 完了 | Pattern 2 の Vue Composable 分離を追加 |
+| Day 19 | 2026/05/27 | 完了 | Pattern 2 の Domain / Application 単体テストと Pattern 1 比較を追加 |
 
 ## 作業ルール
 - クリーンとオニオンの「何が違うのか」を常に確認しながら進める。

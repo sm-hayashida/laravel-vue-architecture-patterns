@@ -149,3 +149,141 @@
 - Repository Interface depends only on Domain Entity and Value Object classes.
 - Domain layer still has no Laravel / Eloquent dependency.
 - README explains the difference between Domain Service and Repository Interface in Pattern 2.
+
+## Day 16: Pattern 2 Application Service
+
+### Purpose
+- Add the Application layer for the Onion implementation.
+- Orchestrate product creation and stock operations without putting business rules back into Controller or Infrastructure.
+- Show how Pattern 2 differs from Pattern 1 by making the Application Service coordinate Domain objects instead of owning stock rules itself.
+
+### Scope
+- Add an Application Service under `pattern2-onion/app/Application/Services/`.
+- Support product creation, stock increase, stock decrease, and direct stock adjustment.
+- Use `ProductRepositoryInterface` for persistence access.
+- Use `StockAdjustmentPolicy` for direct adjustment permission.
+- Add a small Application exception for application-level failures such as missing products or duplicate SKU.
+- Document the Day 16 responsibility placement.
+
+### Out Of Scope
+- Eloquent repository implementation.
+- Laravel service provider binding.
+- HTTP Controller, API routes, FormRequest, Resource, or Presenter.
+- Vue screen or composables.
+- Database transaction handling.
+
+### Acceptance Criteria
+- Application Service depends on Domain interfaces and Domain services, not Infrastructure implementations.
+- Stock increase / decrease / adjustment delegate stock calculation to `Product`.
+- Direct adjustment delegates permission checking to `StockAdjustmentPolicy`.
+- Missing product and duplicate SKU are explicit application-level failures.
+- Domain layer remains free of Laravel / Eloquent dependencies.
+
+## Day 17: Pattern 2 Infrastructure Eloquent Repository
+
+### Purpose
+- Add the Infrastructure layer implementation for the Onion repository contract.
+- Show DIP in code by making an outer Eloquent repository implement the Domain repository interface.
+- Keep Domain and Application independent from Eloquent while allowing Laravel persistence to be connected later.
+
+### Scope
+- Add Eloquent record models under `pattern2-onion/app/Infrastructure/`.
+- Add `EloquentProductRepository` implementing `ProductRepositoryInterface`.
+- Map primitive database values to Domain Entity / Value Object classes.
+- Convert `Money` cents to the existing decimal price shape without float arithmetic.
+- Document Infrastructure responsibility and its difference from Pattern 1 MVC.
+
+### Out Of Scope
+- Laravel app scaffolding for Pattern 2.
+- Service provider binding.
+- Controller, API routes, FormRequest, Resource, or Presenter.
+- Vue screen or composables.
+- Stock movement audit writing. The current repository contract saves Product state only and does not carry movement type or reason.
+
+### Acceptance Criteria
+- `EloquentProductRepository` implements `ProductRepositoryInterface`.
+- Infrastructure depends inward on Domain classes.
+- Domain and Application do not depend on Infrastructure.
+- Product database rows can be mapped to and from the Domain `Product` aggregate.
+- Price mapping avoids float conversion.
+
+## Day 18a: Pattern 2 Controller / DI / API Connection
+
+### Purpose
+- Connect the Onion backend layers before introducing Vue Composables.
+- Make the API contract concrete so the frontend can call a stable Pattern 2 endpoint shape.
+- Demonstrate that the Controller is thinner than Pattern 1 because it delegates application flow and business rules.
+
+### Scope
+- Add a Laravel API Controller for Pattern 2 products.
+- Add API routes for product listing, product creation, and stock update.
+- Bind `ProductRepositoryInterface` to `EloquentProductRepository` through a service provider.
+- Add list support to the repository contract and Application Service for frontend use.
+- Keep the Controller responsible for HTTP validation, primitive-to-Value-Object conversion, and JSON response formatting.
+
+### Out Of Scope
+- Vue Composable implementation.
+- Full Laravel scaffold for Pattern 2.
+- FormRequest, Resource, Presenter, authentication, or authorization middleware.
+- Stock movement audit writing.
+- Transaction and row-locking behavior.
+
+### Acceptance Criteria
+- `ProductRepositoryInterface` resolves to `EloquentProductRepository` through DI.
+- Controller does not call Eloquent records directly.
+- Controller delegates product creation and stock updates to `ProductInventoryService`.
+- API response shape for products is explicit and frontend-ready.
+- Domain and Application remain independent from Laravel HTTP and Infrastructure classes.
+
+## Day 18b: Pattern 2 Vue Composable Separation
+
+### Purpose
+- Implement the Pattern 2 frontend comparison point from Day 18.
+- Move API calls, state management, form state, and error handling out of the Vue component.
+- Make the UI component thinner than Pattern 1 while keeping the same inventory workflow.
+
+### Scope
+- Add TypeScript product API types.
+- Add a product API module for HTTP calls.
+- Add `useInventoryProducts` composable for state and workflow logic.
+- Add a Vue inventory component that consumes the composable.
+- Add a Pattern 2 Vue entrypoint.
+- Document the frontend responsibility split.
+
+### Out Of Scope
+- Full Pattern 2 Laravel frontend scaffold and Blade mount point.
+- Installing npm dependencies.
+- Frontend build verification.
+- Styling parity with Pattern 1.
+- Authentication, routing, or global state management.
+
+### Acceptance Criteria
+- Vue component does not import axios directly.
+- API request / response types are explicit.
+- Product listing, product creation, and stock update flows are exposed by the composable.
+- The component mostly handles rendering and user events.
+- Documentation explains the contrast with Pattern 1's inline Vue implementation.
+
+## Day 19: Pattern 2 Unit Tests And Pattern 1 Comparison
+
+### Purpose
+- Verify that Pattern 2's Domain and Application layers can be tested without HTTP, Eloquent, or database setup.
+- Make the testability difference from Pattern 1's MVC Feature Test coverage explicit.
+
+### Scope
+- Add lightweight PHPUnit configuration for `pattern2-onion/`.
+- Add Domain unit tests for stock calculation, negative-stock rejection, Value Object validation, and direct-adjustment permission.
+- Add Application Service unit tests using an in-memory `ProductRepositoryInterface` test double.
+- Document how Pattern 2's unit tests differ from Pattern 1's HTTP/DB-oriented tests.
+
+### Out Of Scope
+- Full Laravel scaffold for Pattern 2.
+- Database-backed Infrastructure or Controller Feature Tests.
+- Frontend component/composable tests.
+- Changing production behavior in Domain, Application, Infrastructure, Controller, or Vue code.
+
+### Acceptance Criteria
+- Domain rules can be tested by instantiating Entity, Value Object, and Domain Service classes directly.
+- Application Service can be tested by swapping `ProductRepositoryInterface` with an in-memory repository.
+- Duplicate SKU, missing product, stock increase/decrease, manager adjustment, and staff adjustment failure are covered.
+- Documentation explains why Pattern 2 has more files but narrower and faster test targets than Pattern 1.

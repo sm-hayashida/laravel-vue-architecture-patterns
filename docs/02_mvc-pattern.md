@@ -127,3 +127,11 @@ Day 12 の `InventoryApp.vue` は、商品作成、在庫更新、一覧取得�
 - Vue 側では、Composable に API 呼び出しと状態管理を分けることで、コンポーネントを画面表示に集中させられるか。
 
 Pattern 1 は「悪い実装」ではなく、Laravel で小さく素早く作るための自然な出発点である。ただし、業務ルールが増えるほど、責務の境界が曖昧になり、変更箇所とテスト範囲が広がりやすい。この課題を基準点として、次の Onion + DDD 実装に進む。
+
+## Day 19 で見えた Pattern 2 との差
+
+Pattern 2 では、同じ在庫ルールを Domain / Application の単体テストとして確認できるようになった。
+
+Pattern 1 の Feature Test は「API と DB を含めた全体が動くか」を見るには向いている。一方、在庫計算、直接調整権限、SKU 重複のようなルールだけを確認したいときも Controller / Eloquent / DB を通る。
+
+Pattern 2 では、在庫計算は `Product`、権限判断は `StockAdjustmentPolicy`、操作手順は `ProductInventoryService` に分かれている。そのため、DB を使わずに小さな単位でルールを検証できる。MVC よりファイル数は増えるが、「何を壊したか」「どこを直せばよいか」がテストから追いやすくなる。
