@@ -118,3 +118,15 @@
 - [x] Update Pattern 2 README, docs, and progress log.
 - [x] Run available verification commands.
 - [x] Review changes before handoff.
+
+## Day 20: Pattern 3 UseCase Interactors
+
+- [x] Confirm Day 20 scope from schedule and Clean Architecture docs.
+- [x] Add Day 20 requirements and design.
+- [x] Add Pattern 3 Entity and Value Objects.
+- [x] Add product repository gateway interface.
+- [x] Add use-case input data classes.
+- [x] Add product creation and stock operation Interactors.
+- [x] Update Pattern 3 README, docs, and progress log.
+- [x] Run available verification commands.
+- [x] Review changes before handoff.

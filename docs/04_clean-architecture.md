@@ -63,3 +63,22 @@
 
 **本プロジェクトの方針:**
 Pattern 3 では、この「Input/Output Port」を意識し、Laravelのコントローラーがビジネスロジックに一切触れず、ただユースケースに情報を渡し、Presenterに結果を託す構造を実現する。
+
+## Day 20: UseCase / Interactor を操作単位で分ける
+
+Pattern 3 の実装は、まず UseCase / Interactor から始めた。
+
+Pattern 2 の Onion Architecture では、`ProductInventoryService` が商品作成、在庫増加、在庫減少、直接調整の手順をまとめて持つ。これは Domain を中心に置き、その周囲に Application Service を置く構造として自然だった。
+
+Clean Architecture では、より「このシステムで何ができるか」を前面に出す。そこで Day 20 では、次のように操作ごとの Interactor を追加した。
+
+- `CreateProductInteractor`
+- `IncreaseStockInteractor`
+- `DecreaseStockInteractor`
+- `AdjustStockInteractor`
+
+在庫数の増減や 0 未満を許可しないルールは `Product` Entity に残す。一方で、SKU 重複確認、商品取得、保存、直接調整の権限確認といったアプリケーション操作の流れは Interactor が担当する。
+
+ここでの Pattern 2 との差は、単にクラスを細かくしたことではない。`ProductInventoryService` というデータ中心のまとまりではなく、`IncreaseStock` や `AdjustStock` というユーザーの目的がそのままファイル名になる点が Clean Architecture らしい。
+
+Day 21 では、この Interactor を Controller から呼ぶための Input Port と、Presenter へ結果を渡す Output Port を追加し、境界をさらに明確にする。

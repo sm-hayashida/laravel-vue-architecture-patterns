@@ -413,3 +413,65 @@ pattern2-onion/
 - Run Pattern 2 PHPUnit tests when dependencies are available.
 - Run PHP syntax checks for added test and support files.
 - Confirm no production code changed for Day 19.
+
+## Day 20: Pattern 3 UseCase Interactors
+
+### Application Boundary
+- Add `pattern3-clean/app/Entities/` for enterprise/domain rules.
+- Add `pattern3-clean/app/UseCases/Products/` for application-specific rules.
+- UseCase code must not depend on Laravel, Eloquent, Request / Response, Controller, Presenter, or Pattern 2 classes.
+
+### Directory Additions
+```text
+pattern3-clean/app/
+├── Entities/
+│   ├── Product.php
+│   ├── Enums/
+│   │   └── OperatorRole.php
+│   ├── Exceptions/
+│   │   └── InventoryEntityException.php
+│   └── ValueObjects/
+│       ├── Money.php
+│       ├── MovementQuantity.php
+│       ├── ProductId.php
+│       ├── ProductName.php
+│       ├── Sku.php
+│       └── StockQuantity.php
+└── UseCases/
+    └── Products/
+        ├── CreateProductInput.php
+        ├── CreateProductInteractor.php
+        ├── IncreaseStockInput.php
+        ├── IncreaseStockInteractor.php
+        ├── DecreaseStockInput.php
+        ├── DecreaseStockInteractor.php
+        ├── AdjustStockInput.php
+        ├── AdjustStockInteractor.php
+        ├── Exceptions/
+        │   └── InventoryUseCaseException.php
+        └── Gateways/
+            └── ProductRepositoryInterface.php
+```
+
+### Responsibility Placement
+- `Product` Entity:
+  - owns stock increase, decrease, and direct adjustment behavior.
+  - preserves the invariant that stock cannot be negative.
+- Value Objects:
+  - validate primitive values before they reach Entity / UseCase behavior.
+- `CreateProductInteractor`:
+  - checks SKU duplication and creates a new Product.
+- `IncreaseStockInteractor` / `DecreaseStockInteractor` / `AdjustStockInteractor`:
+  - represent separate user intentions instead of a single product inventory service method group.
+  - load Product through `ProductRepositoryInterface`, ask Entity to apply rules, and save.
+- `AdjustStockInteractor`:
+  - owns the application rule that only managers can directly adjust stock.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 2 groups inventory operations inside `ProductInventoryService`.
+- Pattern 3 makes the application boundary scream the available use cases through class names.
+- Day 21 should add explicit InputPort / OutputPort interfaces and move response shaping toward Presenter boundaries.
+
+### Verification
+- Run PHP syntax checks for Pattern 3 classes.
+- Search Pattern 3 for Laravel / Eloquent / Pattern 2 imports.

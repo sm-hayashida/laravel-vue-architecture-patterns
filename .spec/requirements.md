@@ -287,3 +287,31 @@
 - Application Service can be tested by swapping `ProductRepositoryInterface` with an in-memory repository.
 - Duplicate SKU, missing product, stock increase/decrease, manager adjustment, and staff adjustment failure are covered.
 - Documentation explains why Pattern 2 has more files but narrower and faster test targets than Pattern 1.
+
+## Day 20: Pattern 3 UseCase Interactors
+
+### Purpose
+- Start Pattern 3 Clean Architecture by expressing inventory behavior as explicit use cases.
+- Show the first structural difference from Pattern 2: one Application Service is replaced by operation-specific Interactors.
+- Keep the implementation framework-independent before adding Input / Output Ports, Controller, or Presenter.
+
+### Scope
+- Add minimal Clean Architecture Entities and Value Objects under `pattern3-clean/app/Entities/`.
+- Add use-case input data classes for product creation and stock operations.
+- Add Interactors for product creation, stock increase, stock decrease, and direct stock adjustment.
+- Add a product repository gateway interface required by the Interactors.
+- Document how the Day 20 UseCase layer differs from Pattern 2 Application Service.
+
+### Out Of Scope
+- InputPort / OutputPort interfaces.
+- Presenter, Controller, Laravel service provider binding, routes, or API response shape.
+- Infrastructure repository implementation.
+- Vue frontend or TypeScript contracts.
+- PHPUnit setup or automated unit tests for Pattern 3.
+
+### Acceptance Criteria
+- Each inventory operation has a dedicated Interactor class.
+- Interactors depend on Entities, Value Objects, and repository gateway abstractions only.
+- Stock calculation remains inside `Product`, not inside Interactors.
+- Direct stock adjustment permission is checked before loading and saving product state.
+- Pattern 3 code does not depend on Laravel, Eloquent, HTTP, or Pattern 2 namespaces.
