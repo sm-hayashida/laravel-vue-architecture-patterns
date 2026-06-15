@@ -133,6 +133,7 @@ laravel-vue-architecture-patterns/
 | Day 18b | 2026/05/19 | 完了 | Pattern 2 の Vue Composable 分離を追加 |
 | Day 19 | 2026/05/27 | 完了 | Pattern 2 の Domain / Application 単体テストと Pattern 1 比較を追加 |
 | Day 20 | 2026/05/28 | 完了 | Pattern 3 の UseCase / Interactor を操作単位で追加 |
+| Day 21 | 2026/06/12 | 完了 | Pattern 3 の Input / Output Port を追加 |
 
 ## 作業ルール
 - クリーンとオニオンの「何が違うのか」を常に確認しながら進める。

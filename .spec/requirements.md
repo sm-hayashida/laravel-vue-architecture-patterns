@@ -315,3 +315,31 @@
 - Stock calculation remains inside `Product`, not inside Interactors.
 - Direct stock adjustment permission is checked before loading and saving product state.
 - Pattern 3 code does not depend on Laravel, Eloquent, HTTP, or Pattern 2 namespaces.
+
+## Day 21: Pattern 3 Input / Output Ports
+
+### Purpose
+- Make the Clean Architecture use-case boundary explicit.
+- Separate how controllers call use cases from how presenters receive use-case output.
+- Show the difference from Pattern 2 where controllers call an Application Service and format returned Product values directly.
+
+### Scope
+- Add Input Port interfaces for product creation, stock increase, stock decrease, and direct stock adjustment.
+- Add a Product output data class for presenter-facing use-case results.
+- Add an Output Port interface for presenting product results.
+- Update Interactors to implement their Input Port and send output through the Output Port.
+- Document how Input / Output Ports prepare for Controller / Presenter implementation in Day 22.
+
+### Out Of Scope
+- Concrete Controller implementation.
+- Concrete Presenter implementation.
+- Laravel service provider binding, routes, or HTTP response shape.
+- Infrastructure repository implementation.
+- Frontend changes.
+
+### Acceptance Criteria
+- Controllers can depend on Input Port interfaces instead of concrete Interactors.
+- Interactors do not return `Product` directly to outer layers.
+- Presenter-facing output uses a simple data structure instead of exposing Entity objects.
+- Output shaping is delegated through Output Port, while Entity rules remain inside Entity classes.
+- Pattern 3 code remains independent from Laravel, Eloquent, HTTP, and Pattern 2 namespaces.

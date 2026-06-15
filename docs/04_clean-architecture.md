@@ -82,3 +82,27 @@ Clean Architecture では、より「このシステムで何ができるか」�
 ここでの Pattern 2 との差は、単にクラスを細かくしたことではない。`ProductInventoryService` というデータ中心のまとまりではなく、`IncreaseStock` や `AdjustStock` というユーザーの目的がそのままファイル名になる点が Clean Architecture らしい。
 
 Day 21 では、この Interactor を Controller から呼ぶための Input Port と、Presenter へ結果を渡す Output Port を追加し、境界をさらに明確にする。
+
+## Day 21: Input Port / Output Port で境界を明示する
+
+Day 21 では、Day 20 で作った Interactor に Input Port と Output Port を追加した。
+
+Input Port は、Controller など外側の層が UseCase を呼ぶための Interface である。たとえば Controller は `CreateProductInteractor` という具象クラスではなく、`CreateProductInputPort` に依存できる。
+
+```text
+Controller
+  -> CreateProductInputPort
+      <- CreateProductInteractor
+```
+
+Output Port は、UseCase が結果を Presenter へ渡すための Interface である。Interactor は `Product` Entity をそのまま返さず、`ProductOutputData` に変換して `ProductOutputPort` へ渡す。
+
+```text
+CreateProductInteractor
+  -> ProductOutputPort
+      <- ProductPresenter
+```
+
+ここで Pattern 2 との差が出る。Pattern 2 では Controller が Application Service から返った `Product` を JSON に整形した。Pattern 3 では、UseCase は Output Port に出力し、HTTP や画面に合わせた整形は Presenter 側へ寄せる。
+
+つまり Clean Architecture では、入力側の境界と出力側の境界を両方 Interface として扱う。Controller は入力変換、Interactor はユースケース、Presenter は出力変換に集中できる。

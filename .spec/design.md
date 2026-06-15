@@ -475,3 +475,49 @@ pattern3-clean/app/
 ### Verification
 - Run PHP syntax checks for Pattern 3 classes.
 - Search Pattern 3 for Laravel / Eloquent / Pattern 2 imports.
+
+## Day 21: Pattern 3 Input / Output Ports
+
+### UseCase Boundary
+- Add explicit Input Port interfaces under `UseCases/Products/Ports/Input/`.
+- Add an Output Port interface under `UseCases/Products/Ports/Output/`.
+- Add presenter-facing output data under `UseCases/Products/Outputs/`.
+- Interactors implement Input Ports and depend on Output Ports.
+
+### Directory Additions
+```text
+pattern3-clean/app/UseCases/Products/
+├── Outputs/
+│   └── ProductOutputData.php
+└── Ports/
+    ├── Input/
+    │   ├── CreateProductInputPort.php
+    │   ├── IncreaseStockInputPort.php
+    │   ├── DecreaseStockInputPort.php
+    │   └── AdjustStockInputPort.php
+    └── Output/
+        └── ProductOutputPort.php
+```
+
+### Responsibility Placement
+- Input Port interfaces:
+  - define how outer controllers call each use case.
+  - allow controllers to depend on interfaces rather than concrete Interactors.
+- `ProductOutputData`:
+  - exposes presenter-facing primitive values.
+  - prevents outer layers from receiving Entity objects directly.
+- `ProductOutputPort`:
+  - defines how Interactors hand successful results to a presenter boundary.
+- Interactors:
+  - keep use-case orchestration.
+  - no longer return `Product` to the caller.
+  - call `ProductOutputPort::present()` after saving the Product.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 2 Controller receives a Product from `ProductInventoryService` and formats JSON itself.
+- Pattern 3 Interactor sends output to an Output Port, so Day 22 can introduce a Presenter that owns response shaping.
+- This makes the Controller input side and Presenter output side explicit before adding Laravel HTTP code.
+
+### Verification
+- Run PHP syntax checks for Pattern 3 classes.
+- Search Pattern 3 for Laravel / Eloquent / Pattern 2 imports.

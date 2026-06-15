@@ -8,23 +8,30 @@ use App\Entities\Exceptions\InventoryEntityException;
 use App\Entities\Product;
 use App\UseCases\Products\Exceptions\InventoryUseCaseException;
 use App\UseCases\Products\Gateways\ProductRepositoryInterface;
+use App\UseCases\Products\Outputs\ProductOutputData;
+use App\UseCases\Products\Ports\Input\DecreaseStockInputPort;
+use App\UseCases\Products\Ports\Output\ProductOutputPort;
 
-final class DecreaseStockInteractor
+final class DecreaseStockInteractor implements DecreaseStockInputPort
 {
-    public function __construct(private readonly ProductRepositoryInterface $products)
-    {
+    public function __construct(
+        private readonly ProductRepositoryInterface $products,
+        private readonly ProductOutputPort $output,
+    ) {
     }
 
     /**
      * @throws InventoryEntityException
      * @throws InventoryUseCaseException
      */
-    public function execute(DecreaseStockInput $input): Product
+    public function execute(DecreaseStockInput $input): void
     {
         $product = $this->findProduct($input);
         $product->decreaseStock($input->quantity);
 
-        return $this->products->save($product);
+        $product = $this->products->save($product);
+
+        $this->output->present(ProductOutputData::fromProduct($product));
     }
 
     private function findProduct(DecreaseStockInput $input): Product

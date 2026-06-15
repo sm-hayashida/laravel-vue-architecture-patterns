@@ -130,3 +130,14 @@
 - [x] Update Pattern 3 README, docs, and progress log.
 - [x] Run available verification commands.
 - [x] Review changes before handoff.
+
+## Day 21: Pattern 3 Input / Output Ports
+
+- [x] Confirm Day 21 scope from schedule and Day 20 Interactor state.
+- [x] Add Day 21 requirements and design.
+- [x] Add Input Port interfaces for product use cases.
+- [x] Add Product output data and Output Port interface.
+- [x] Update Interactors to use Input / Output Ports.
+- [x] Update Pattern 3 README, docs, and progress log.
+- [x] Run available verification commands.
+- [x] Review changes before handoff.
