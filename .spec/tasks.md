@@ -141,3 +141,13 @@
 - [x] Update Pattern 3 README, docs, and progress log.
 - [x] Run available verification commands.
 - [x] Review changes before handoff.
+
+## Day 22: Pattern 3 Controller / Presenter
+
+- [x] Confirm Day 22 scope from schedule and Day 21 port state.
+- [x] Add Day 22 requirements and design.
+- [x] Add Product Controller that depends on Input Port interfaces.
+- [x] Add Product Presenter that implements Output Port.
+- [x] Update Pattern 3 README, docs, and progress log.
+- [x] Run available verification commands.
+- [x] Review changes before handoff.

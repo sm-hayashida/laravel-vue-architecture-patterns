@@ -521,3 +521,69 @@ pattern3-clean/app/UseCases/Products/
 ### Verification
 - Run PHP syntax checks for Pattern 3 classes.
 - Search Pattern 3 for Laravel / Eloquent / Pattern 2 imports.
+
+## Day 22: Pattern 3 Controller / Presenter
+
+### Interface Adapter Boundary
+- Add HTTP and presentation code outside the UseCase / Entity layers.
+- Controller may depend on Input Port interfaces, input DTOs, Value Objects, Laravel Request / JsonResponse, and the concrete Presenter.
+- Presenter may depend on `ProductOutputData`, `ProductOutputPort`, and Laravel JsonResponse.
+- UseCases and Entities must not depend on Controller, Presenter, Laravel Request / Response, or Pattern 2 namespaces.
+- Full Laravel DI wiring remains outside Day 22. When wiring is added later, `ProductOutputPort` and the Controller-visible `ProductPresenter` must resolve to the same request-scoped instance.
+
+### Directory Additions
+```text
+pattern3-clean/app/
+├── Http/
+│   └── Controllers/
+│       └── ProductController.php
+└── InterfaceAdapters/
+    └── Presenters/
+        └── ProductPresenter.php
+```
+
+### API Contract
+- `POST /products`
+  - request: `sku`, `name`, `stock_quantity`, `price_amount_in_cents`.
+  - response: `201` with `data: ProductResponse`.
+- `POST /products/{productId}/stock`
+  - request: `type`, `quantity`, `operator_role`.
+  - `type` is one of `in`, `out`, `adjustment`.
+  - response: `200` with `data: ProductResponse`.
+
+`ProductResponse`:
+```json
+{
+  "id": 1,
+  "sku": "SKU-001",
+  "name": "Sample Product",
+  "stock_quantity": 10,
+  "price_amount_in_cents": 1200
+}
+```
+
+### Responsibility Placement
+- `ProductController`:
+  - validates HTTP request shape.
+  - converts request primitives into Value Objects and use-case input DTOs.
+  - calls Input Port interfaces such as `CreateProductInputPort`.
+  - maps domain/use-case failures to HTTP status codes.
+  - does not receive or format `Product` Entity objects.
+- `ProductPresenter`:
+  - implements `ProductOutputPort`.
+  - converts `ProductOutputData` into API response keys.
+  - owns the JSON-facing field names such as `stock_quantity` and `price_amount_in_cents`.
+- Interactors:
+  - still execute use-case flow and call `ProductOutputPort`.
+  - remain unaware of JSON, HTTP status, Controller, and Presenter implementation details.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 2 Controller called `ProductInventoryService`, received a `Product`, and formatted JSON inside the Controller.
+- Pattern 3 Controller sends input through Input Ports and receives output indirectly through Presenter.
+- This makes the Controller input side and Presenter output side separate, so response-shape changes can be localized to the Presenter.
+
+### Verification
+- Run PHP syntax checks for Pattern 3 classes.
+- Search Pattern 3 UseCases and Entities for Laravel HTTP / Controller / Presenter imports.
+- Confirm Controller does not import `App\Entities\Product`.
+- Confirm the remaining runtime DI wiring gap is documented as non-scope.

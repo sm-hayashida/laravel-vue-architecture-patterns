@@ -107,6 +107,56 @@ Pattern 2 では、Controller が `ProductInventoryService` を呼び、返っ�
 
 Pattern 3 では、Controller 側は Input Port に入力を渡し、出力整形は Output Port の先にある Presenter に任せます。これにより、Controller は入力変換、Presenter は出力変換、Interactor はユースケースの実行、Entity は在庫ルールという境界がより明確になります。
 
+## Day 22: Controller / Presenter の実装
+
+Day 22 では、Day 21 で定義した Input Port / Output Port の外側に Controller と Presenter を追加しました。
+
+```text
+app/
+├── Http/
+│   └── Controllers/
+│       └── ProductController.php
+└── InterfaceAdapters/
+    └── Presenters/
+        └── ProductPresenter.php
+```
+
+### Controller
+
+`ProductController` は HTTP リクエストを受け取り、Laravel の validation を行ったあと、プリミティブ値を Value Object と UseCase input DTO に変換します。
+
+```text
+HTTP Request
+  -> ProductController
+      -> CreateProductInputPort
+      -> IncreaseStockInputPort
+      -> DecreaseStockInputPort
+      -> AdjustStockInputPort
+```
+
+ここで重要なのは、Controller が具体的な `CreateProductInteractor` ではなく `CreateProductInputPort` に依存している点です。Controller は「どの UseCase を呼ぶか」は知っていますが、UseCase の実装詳細や Entity の内部構造は知りません。
+
+### Presenter
+
+`ProductPresenter` は `ProductOutputPort` を実装し、UseCase から渡された `ProductOutputData` を API レスポンス用のキーに変換します。
+
+```text
+Interactor
+  -> ProductOutputPort
+      <- ProductPresenter
+          -> JSON response data
+```
+
+Pattern 2 では Controller が `Product` を受け取り、`stock_quantity` や `price_amount_in_cents` のような JSON キーへ直接変換していました。Pattern 3 ではこの出力整形を Presenter に移し、Controller は入力変換と HTTP status の返却に集中します。
+
+### Pattern 2 との違い
+
+Pattern 2 の Controller は薄くなっていましたが、Application Service から返った `Product` を JSON に変換する責務はまだ Controller に残っていました。
+
+Pattern 3 では、UseCase は `ProductOutputData` を `ProductOutputPort` に渡し、Presenter が API response shape を決めます。これにより、API の表示形式を変えたい場合も、UseCase や Entity ではなく Presenter を中心に変更できます。
+
+Day 22 時点では Laravel の DI binding はまだ追加していません。実際に HTTP 経由で動かす段階では、Interactor が使う `ProductOutputPort` と Controller が response を取り出す `ProductPresenter` が同じ request scope のインスタンスになるように wiring する必要があります。
+
 ## 次のステップ
 
-- Day 22: Controller / Presenter の実装。
+- Day 23: TypeScript による厳格な型定義共有。

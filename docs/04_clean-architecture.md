@@ -106,3 +106,23 @@ CreateProductInteractor
 ここで Pattern 2 との差が出る。Pattern 2 では Controller が Application Service から返った `Product` を JSON に整形した。Pattern 3 では、UseCase は Output Port に出力し、HTTP や画面に合わせた整形は Presenter 側へ寄せる。
 
 つまり Clean Architecture では、入力側の境界と出力側の境界を両方 Interface として扱う。Controller は入力変換、Interactor はユースケース、Presenter は出力変換に集中できる。
+
+## Day 22: Controller / Presenter で外側の責務を分ける
+
+Day 22 では、Pattern 3 に `ProductController` と `ProductPresenter` を追加した。
+
+Controller は HTTP request を受け取り、validation とプリミティブ値から Value Object / input DTO への変換を担当する。たとえば `quantity` という数値は、在庫増減では `MovementQuantity`、直接調整では `StockQuantity` として UseCase に渡す。Controller は HTTP の入口なので request validation は行うが、在庫計算や JSON レスポンスの詳細な整形は持たない。
+
+Presenter は `ProductOutputPort` を実装し、UseCase から渡された `ProductOutputData` を API response shape に変換する。`stockQuantity` という内部向けの値を `stock_quantity` という API キーにする責務は Presenter に寄せる。
+
+```text
+ProductController
+  -> IncreaseStockInputPort
+      <- IncreaseStockInteractor
+          -> ProductOutputPort
+              <- ProductPresenter
+```
+
+Pattern 2 では、Controller が `ProductInventoryService` を呼び、返された `Product` を JSON に整形していた。これは Onion として十分に薄い Controller だが、出力変換はまだ Controller にある。
+
+Pattern 3 では、入力変換は Controller、ユースケースの流れは Interactor、業務ルールは Entity、出力変換は Presenter という形に分けた。これにより「API の見せ方を変える変更」は Presenter に寄せやすくなり、UseCase / Entity に HTTP や JSON の都合が入りにくくなる。

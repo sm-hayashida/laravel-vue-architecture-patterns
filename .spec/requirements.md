@@ -343,3 +343,32 @@
 - Presenter-facing output uses a simple data structure instead of exposing Entity objects.
 - Output shaping is delegated through Output Port, while Entity rules remain inside Entity classes.
 - Pattern 3 code remains independent from Laravel, Eloquent, HTTP, and Pattern 2 namespaces.
+
+## Day 22: Pattern 3 Controller / Presenter
+
+### Purpose
+- Add the first outer Interface Adapter layer for the Clean Architecture implementation.
+- Make the Day 21 input and output ports concrete by showing how HTTP input reaches UseCases and how UseCase output becomes an API response.
+- Contrast Pattern 3 with Pattern 2, where the Controller directly formatted returned Domain objects.
+
+### Scope
+- Add a Product HTTP Controller for product creation and stock updates.
+- Add a Product Presenter that implements `ProductOutputPort`.
+- Keep Controller responsibility limited to HTTP validation, primitive-to-input conversion, Input Port calls, and HTTP error status mapping.
+- Keep Presenter responsibility limited to API response shape.
+- Update Pattern 3 documentation and progress tracking.
+
+### Out Of Scope
+- Concrete Infrastructure repository implementation.
+- Laravel service provider binding for repositories, input ports, and output ports.
+- Runtime DI wiring that guarantees the same Presenter instance is shared between the Controller response and Interactor Output Port.
+- Product listing endpoint.
+- Vue frontend or TypeScript contracts.
+- Automated Pattern 3 tests.
+
+### Acceptance Criteria
+- Controller depends on Input Port interfaces instead of concrete Interactors.
+- Controller does not format `Product` Entity objects directly.
+- Presenter implements `ProductOutputPort` and owns the API response data shape.
+- Interactors, UseCases, and Entities remain independent from Laravel HTTP classes.
+- Documentation explains why Presenter exists in Pattern 3 and how it differs from Pattern 2.
