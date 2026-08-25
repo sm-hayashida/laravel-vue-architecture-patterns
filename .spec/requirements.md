@@ -428,3 +428,27 @@
 - Manager direct adjustment saves and presents updated product output.
 - Staff direct adjustment throws `Only managers can adjust stock directly.` before repository or output work.
 - Day 24 is marked complete only after the Pattern 3 PHPUnit suite passes.
+
+## Day 25: Onion vs Clean Structural Comparison
+
+### Purpose
+- Complete the Day 25 learning comparison between this repository's Pattern 2 Onion + DDD implementation and Pattern 3 Clean + DDD implementation.
+- Prevent terminology-based misunderstandings by grounding the comparison in the current classes and documented runtime gaps.
+
+### Scope
+- Add `docs/08_onion-vs-clean.md` as the canonical Day 25 comparison.
+- Document the concrete request-to-response paths for Pattern 2 and Pattern 3.
+- Update the root README and Pattern 3 README to point to the comparison without presenting the whole roadmap as complete.
+- Update progress tracking for Day 25.
+
+### Out Of Scope
+- Runtime code changes in Pattern 1, Pattern 2, or Pattern 3.
+- New DI providers, repositories, routes, migrations, dependencies, tests, or integration wiring.
+- Completing Day 26 or rewriting the final README.
+
+### Acceptance Criteria
+- The comparison states the shared foundation: inward dependencies, DI compatibility, Laravel/Eloquent-independent business rules, and persistence behind an interface.
+- The comparison states repository-specific differences: `ProductInventoryService` versus operation-specific Interactors, implicit Application Service entry versus explicit Input Ports, Domain `Product` returned to Controller versus `ProductOutputData` through Output Port to `ProductPresenter`, and in-memory repository tests versus mocked Repository/Output Port tests.
+- The comparison states that class names, Interactor count, DI, and interfaces alone do not define Onion or Clean, and that Onion converges with Clean when explicit use-case input/output boundaries are added.
+- The comparison accurately states that Pattern 3 still lacks Eloquent repository implementation, Laravel DI wiring, routes, and HTTP-to-DB integration proof.
+- Day 25 is marked complete with date `2026/08/25`.

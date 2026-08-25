@@ -670,3 +670,34 @@ pattern3-clean/app/
 - Run `php -l pattern3-clean/tests/Unit/UseCases/ProductInteractorsTest.php`.
 - Run `git diff --check`.
 - Confirm no files under `pattern3-clean/app/`, Pattern 1, or Pattern 2 changed, and no staged changes exist.
+
+## Day 25: Onion vs Clean Structural Comparison
+
+### Documentation Boundary
+- Add a documentation-only Day 25 comparison under `docs/08_onion-vs-clean.md`.
+- Keep the comparison grounded in existing Pattern 2 and Pattern 3 classes.
+- Do not change PHP, TypeScript, test, HTTP, JSON, or business behavior.
+
+### Responsibility Placement
+- Pattern 2:
+  - `ProductController` receives HTTP input, converts primitives to Value Objects and enums, calls `ProductInventoryService`, and formats returned Domain `Product` objects into JSON.
+  - `ProductInventoryService` groups product creation, stock increase, stock decrease, direct adjustment, and listing operations.
+  - Persistence is accessed through Domain `ProductRepositoryInterface`; the runtime binding to `EloquentProductRepository` already exists in Pattern 2.
+- Pattern 3:
+  - `ProductController` receives HTTP input, converts primitives to input DTOs, and calls Input Port interfaces.
+  - `CreateProductInteractor`, `IncreaseStockInteractor`, `DecreaseStockInteractor`, and `AdjustStockInteractor` own operation-specific use-case flow.
+  - Interactors send `ProductOutputData` through `ProductOutputPort`; `ProductPresenter` owns JSON-facing output shape.
+  - Pattern 3 currently has no Eloquent repository implementation, Laravel DI wiring, routes, or HTTP-to-DB integration proof.
+
+### Comparison Shape
+- Include one concise table.
+- Include small textual request-to-response diagrams for Pattern 2 and Pattern 3.
+- Include a terminology caveat: class names, Interactor count, DI, and interfaces alone are insufficient to define the architecture.
+- Include a trade-off summary: Onion has fewer explicit boundary types and suits domain-centered grouping; Clean adds ceremony but makes use-case input/output ownership and test seams explicit.
+
+### Verification
+- Run `git diff --check`.
+- Run `git status --short --branch` and confirm no staged changes.
+- Inspect `git diff --name-only` and confirm all changed files are in the allowed Day 25 documentation list.
+- Search updated documentation for the required comparison terms and Pattern 3 runtime gap.
+- Confirm no files under `pattern1-mvc/`, `pattern2-onion/`, `pattern3-clean/app/`, `pattern3-clean/resources/`, or `pattern3-clean/tests/` changed.

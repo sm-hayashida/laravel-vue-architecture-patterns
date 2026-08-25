@@ -80,3 +80,4 @@
 | Day 22 | 2026/06/18 | 完了 | Pattern 3 の Controller / Presenter を追加 |
 | Day 23 | 2026/08/25 | 完了 | Pattern 3 の TypeScript API contract を追加 |
 | Day 24 | 2026/08/25 | 完了 | Pattern 3 の Interactor を PHPUnit mock ports で直接テスト |
+| Day 25 | 2026/08/25 | 完了 | Onion + DDD と Clean + DDD の構造的差異を現在のコードで比較 |

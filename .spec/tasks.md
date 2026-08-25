@@ -170,3 +170,13 @@
 - [x] Cover product creation, duplicate SKU, stock increase/decrease, missing product, below-zero decrease, manager adjustment, and staff adjustment rejection.
 - [x] Update Pattern 3 README, Clean Architecture docs, and progress tracking.
 - [x] Run required verification commands.
+
+## Day 25: Onion vs Clean Structural Comparison
+
+- [x] Confirm current Pattern 2 and Pattern 3 responsibility placement from code.
+- [x] Add `docs/08_onion-vs-clean.md` as the canonical Day 25 comparison.
+- [x] Document concrete Pattern 2 and Pattern 3 request-to-response paths.
+- [x] Document shared foundations, repository-specific differences, terminology caveats, Pattern 3 runtime gap, and selection trade-offs.
+- [x] Update root README and Pattern 3 README without completing Day 26.
+- [x] Update Day 25 requirements, design, and progress tracking.
+- [x] Run required documentation-scope verification commands.

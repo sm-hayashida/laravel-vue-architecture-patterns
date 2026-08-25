@@ -210,6 +210,14 @@ Pattern 2 の Unit Test は `ProductInventoryService` を in-memory repository �
 
 Pattern 3 の Unit Test は操作ごとの Interactor を直接呼び、Repository Gateway だけでなく Output Port も PHPUnit mock に差し替えます。UseCase が内側の interface にだけ依存しているため、Controller、Presenter、Eloquent、Laravel DI wiring を用意しなくても、高速に application flow と output boundary を保護できます。
 
+## Day 25: Onion vs Clean の構造比較
+
+Day 25 では、Pattern 2 Onion + DDD と Pattern 3 Clean + DDD の違いを `docs/08_onion-vs-clean.md` にまとめました。
+
+この Pattern 3 では、Pattern 2 の `ProductInventoryService` に相当する操作を `CreateProductInteractor`、`IncreaseStockInteractor`、`DecreaseStockInteractor`、`AdjustStockInteractor` に分けています。Controller は `CreateProductInputPort` などの Input Port を呼び、Interactor は `ProductOutputData` を `ProductOutputPort` に渡し、`ProductPresenter` が JSON response shape を持ちます。
+
+一方で、現時点では Eloquent repository 実装、Laravel DI wiring、routes、HTTP から DB までを通す integration proof はまだありません。Pattern 3 の現在の検証範囲は、Interactor を Repository / Output Port mock で直接確認する UseCase 境界までです。
+
 ## 次のステップ
 
-- Day 25: Onion vs Clean の構造的差異をまとめる。
+- Day 26: 全体振り返り・最終READMEの完成。

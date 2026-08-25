@@ -35,6 +35,9 @@
 └── pattern3-clean/      # 実装③: クリーン + DDD
 ```
 
+## 学習ログ
+- `docs/08_onion-vs-clean.md`: Day 25 の Onion + DDD と Clean + DDD の構造比較。現在の Pattern 2 / Pattern 3 のクラスに沿って、リクエストからレスポンスまでの流れと境界の違いを整理しています。
+
 ## 開発環境
 - PHP 8.x / Laravel 10.x
 - Node.js / Vue.js 3 / TypeScript
