@@ -630,3 +630,43 @@ pattern3-clean/app/
 - Run `npm --prefix pattern3-clean run typecheck`.
 - Run `git diff --check`.
 - Confirm changed paths are within Day 23 scope and no PHP files changed.
+
+## Day 24: Pattern 3 Mocked Fast Interactor Tests
+
+### Test Boundary
+- Test type: Unit.
+- Boundary path: direct test call -> Interactor/Input DTO -> real Entity -> mocked Repository/Output Ports.
+- The PHPUnit mocks are outer test adapters. The UseCase remains dependent only on `ProductRepositoryInterface` and `ProductOutputPort`.
+- Do not cross HTTP, Laravel DI, Eloquent, database state, jobs, broadcasting, or external APIs.
+
+### Test Setup
+- Add `pattern3-clean/composer.json` with the same minimal PHPUnit and PSR-4 style used by Pattern 2.
+- Add `pattern3-clean/phpunit.xml` with `tests/bootstrap.php` and `tests/Unit`.
+- Add `pattern3-clean/tests/bootstrap.php` to autoload `App\\` and `Tests\\`.
+- Add `pattern3-clean/.gitignore` for local dependency and PHPUnit cache artifacts.
+
+### UseCase Unit Cases
+- `CreateProductInteractor`:
+  - success: duplicate check is false, a real `Product` is saved, and `ProductOutputData` is presented.
+  - duplicate SKU: exception is thrown before save or output.
+- `IncreaseStockInteractor`:
+  - success: existing product stock is increased, saved, and presented.
+  - missing product: exception is thrown before save or output.
+- `DecreaseStockInteractor`:
+  - success: existing product stock is decreased, saved, and presented.
+  - below zero: Entity exception is thrown before save or output.
+- `AdjustStockInteractor`:
+  - manager: stock is adjusted, saved, and presented.
+  - staff: use-case exception is thrown before any repository or output work.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 1 MVC protects the caller-visible slice through HTTP requests, Eloquent persistence, and database assertions.
+- Pattern 2 Onion protects Domain and Application behavior without HTTP or DB by using an in-memory implementation of the repository interface.
+- Pattern 3 Clean protects operation-specific UseCases by replacing both the Repository Gateway and Output Port with PHPUnit mocks, so the test can assert persistence/output side effects without building Controller, Presenter, Eloquent, or Laravel wiring.
+
+### Verification
+- Run `/Users/hayashida/Documents/learning/laravel-vue-architecture-patterns/pattern1-mvc/vendor/bin/phpunit -c pattern3-clean/phpunit.xml --do-not-cache-result`.
+- Run `php -l pattern3-clean/tests/bootstrap.php`.
+- Run `php -l pattern3-clean/tests/Unit/UseCases/ProductInteractorsTest.php`.
+- Run `git diff --check`.
+- Confirm no files under `pattern3-clean/app/`, Pattern 1, or Pattern 2 changed, and no staged changes exist.

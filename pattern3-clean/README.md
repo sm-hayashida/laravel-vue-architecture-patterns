@@ -179,6 +179,37 @@ Pattern 2 の TypeScript type は、Composable と API module が共有する小
 
 Pattern 3 では、同じ HTTP boundary をそのまま緩い payload として置くのではなく、Clean Architecture の Input / Output boundary に合わせて `IncreaseStockRequest` や `ProductPresenterResponse` のように操作と Presenter を名前に出します。これは PHP から TypeScript を自動生成する仕組みではなく、現在の JSON contract を consumer 側で厳格に写したものです。
 
+## Day 24: Mocked Fast Interactor Tests
+
+Day 24 では、Pattern 3 の Interactor を Laravel HTTP、Eloquent、database から切り離して直接テストしました。
+
+```text
+tests/
+└── Unit/
+    └── UseCases/
+        └── ProductInteractorsTest.php
+```
+
+テストは `CreateProductInteractor`、`IncreaseStockInteractor`、`DecreaseStockInteractor`、`AdjustStockInteractor` を直接呼びます。入力には real Input DTO と Value Object を使い、在庫ルールには real `Product` Entity を使います。差し替えるのは外側の境界である `ProductRepositoryInterface` と `ProductOutputPort` だけです。
+
+```text
+Test
+  -> Interactor
+      -> Product Entity
+      -> ProductRepositoryInterface mock
+      -> ProductOutputPort mock
+```
+
+これにより、成功時は `ProductOutputData` の observable fields と save/present の side effect を確認できます。失敗時は例外メッセージと、save や output が行われないことを確認できます。
+
+### Pattern 1 / Pattern 2 との違い
+
+Pattern 1 の Feature Test は HTTP request から入り、Eloquent と database assertions まで含めて MVC slice を確認します。これは利用者に近い一方で、実行境界は広くなります。
+
+Pattern 2 の Unit Test は `ProductInventoryService` を in-memory repository に差し替えて確認します。Application Service と Domain を DB なしで守れますが、Service は複数操作をまとめて持ちます。
+
+Pattern 3 の Unit Test は操作ごとの Interactor を直接呼び、Repository Gateway だけでなく Output Port も PHPUnit mock に差し替えます。UseCase が内側の interface にだけ依存しているため、Controller、Presenter、Eloquent、Laravel DI wiring を用意しなくても、高速に application flow と output boundary を保護できます。
+
 ## 次のステップ
 
-- Day 24: モックを使用した高速なテスト実装。
+- Day 25: Onion vs Clean の構造的差異をまとめる。

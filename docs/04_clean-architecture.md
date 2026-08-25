@@ -145,3 +145,21 @@ ProductPresenter
 Pattern 2 では、Composable と API module が扱いやすいように `CreateProductPayload` や `UpdateStockPayload` という汎用的な API DTO を置いた。Pattern 3 では Clean Architecture の意図に合わせて、`IncreaseStockRequest`、`DecreaseStockRequest`、`AdjustStockRequest` のように操作名を型名に出す。
 
 `StockOperationRequest` は `type` を discriminant にした union なので、`in`、`out`、`adjustment` の組み合わせを TypeScript が静的に確認できる。成功レスポンスは `ProductPresenterResponse` として表し、Presenter が返す `data` envelope と `id: number | null` をそのまま持つ。
+
+## Day 24: Mocked Fast Interactor Tests で UseCase 境界を保護する
+
+Day 24 では、Pattern 3 の Interactor を Laravel HTTP、Eloquent、database なしで直接テストした。
+
+```text
+PHPUnit Test
+  -> Interactor / Input DTO
+      -> Product Entity
+      -> ProductRepositoryInterface mock
+      -> ProductOutputPort mock
+```
+
+ここで重要なのは、mock が UseCase の内側に入っていないことだ。`ProductRepositoryInterface` と `ProductOutputPort` は UseCase が外側と話すための Port であり、テストの mock はその Port を実装する外側の adapter として振る舞う。Interactor は引き続き interface だけに依存し、Laravel Controller、Presenter、Eloquent repository、database は登場しない。
+
+Pattern 1 MVC のテストは HTTP request から入り、Eloquent と database state まで含めて「画面/API に近い一連の流れ」を守る。Pattern 2 Onion のテストは `ProductInventoryService` を in-memory repository で動かし、Application Service と Domain の手順を DB から切り離して守る。Pattern 3 Clean のテストはさらに操作単位を前面に出し、`CreateProductInteractor`、`IncreaseStockInteractor`、`DecreaseStockInteractor`、`AdjustStockInteractor` それぞれの入力、保存 side effect、Output Port への出力を直接確認する。
+
+この境界により、テストは高速で、失敗したときの原因も UseCase flow、Entity rule、Repository Port、Output Port のどこにあるかを切り分けやすい。一方で HTTP validation、Presenter JSON shape、Laravel DI wiring、Eloquent persistence はこのテストでは守らない。Clean Architecture では、どの Port を差し替えて何を守るかを明示することで、テストの責務も層ごとに分けられる。

@@ -398,3 +398,33 @@
 - Presenter success output is represented with a `data` envelope and nullable `id`.
 - TypeScript rejects invalid literal combinations through compile-time fixtures.
 - Documentation states that these contracts mirror the current JSON boundary and are not generated from PHP.
+
+## Day 24: Pattern 3 Mocked Fast Interactor Tests
+
+### Purpose
+- Prove Pattern 3 Interactors can be tested directly without Laravel HTTP, Eloquent, or a database.
+- Make the learning contrast explicit: Pattern 1 verifies an MVC slice through HTTP and DB, Pattern 2 verifies one Application Service with an in-memory repository, and Pattern 3 verifies operation-specific UseCases by mocking Repository and Output Ports.
+
+### Scope
+- Add a self-contained PHPUnit setup under `pattern3-clean/`.
+- Add focused UseCase unit tests for product creation, stock increase, stock decrease, and direct stock adjustment.
+- Use real `Product`, Value Objects, Input DTOs, and Interactors.
+- Use PHPUnit mocks only for `ProductRepositoryInterface` and `ProductOutputPort`.
+- Document why ports make these tests fast and how the test boundary differs across MVC, Onion, and Clean.
+
+### Out Of Scope
+- Pattern 3 application/runtime behavior changes.
+- Changes to Pattern 3 Entity, UseCase, Controller, Presenter, Port, repository contract, HTTP contract, or TypeScript contract files.
+- Laravel DI wiring, Controller/API tests, Presenter JSON tests, Eloquent repository implementation, database tests, Vue tests, coverage tooling, production refactors, new business rules, and Pattern 1 or Pattern 2 changes.
+- Hand-written fake repositories or presenters.
+
+### Acceptance Criteria
+- Pattern 3 has a local PHPUnit manifest, bootstrap, and UseCase unit test file.
+- Product creation presents `ProductOutputData` with the expected observable fields.
+- Duplicate SKU throws `Product SKU already exists.` and performs no save or output.
+- Stock increase and decrease save and present updated product output.
+- Missing product throws `Product was not found.` and performs no save or output.
+- Decrease below zero throws `Stock quantity cannot be negative.` and performs no save or output.
+- Manager direct adjustment saves and presents updated product output.
+- Staff direct adjustment throws `Only managers can adjust stock directly.` before repository or output work.
+- Day 24 is marked complete only after the Pattern 3 PHPUnit suite passes.
