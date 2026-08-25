@@ -151,3 +151,13 @@
 - [x] Update Pattern 3 README, docs, and progress log.
 - [x] Run available verification commands.
 - [x] Review changes before handoff.
+
+## Day 23: Pattern 3 TypeScript API Contracts
+
+- [x] Confirm Day 23 scope from approved SDD Lite brief and Day 22 HTTP boundary.
+- [x] Add strict TypeScript tooling for Pattern 3 contract verification.
+- [x] Add operation-oriented product request and Presenter response contract types.
+- [x] Add compile-time contract fixtures using `satisfies` and `@ts-expect-error`.
+- [x] Update Pattern 3 README, docs, and progress log.
+- [x] Run required verification commands.
+- [x] Review changes before handoff.

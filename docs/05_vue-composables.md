@@ -78,3 +78,11 @@ Pattern 1 の `InventoryApp.vue` は、画面表示、form state、axios 呼び�
 Pattern 2 では、`InventoryApp.vue` は composable から返された `products`、`productForm`、`stockForm`、`submitProduct`、`submitStockUpdate` などを使うだけにした。API endpoint や error response の扱いは component から隠れる。
 
 この分離によって、frontend でも backend と同じように「UI は UI」「操作手順は Composable」「HTTP 詳細は API module」という責務分離を確認できる。
+
+## Day 23: Pattern 3 の TypeScript contract
+
+Pattern 3 では、まだ Vue component や composable は追加しない。代わりに、Day 22 の `ProductController` / `ProductPresenter` が公開する HTTP boundary を `resources/js/contracts/product.ts` に写した。
+
+Pattern 2 の TypeScript type は、Composable が API module と共有する DTO として置いた。一方で Pattern 3 の TypeScript type は、`CreateProductRequest`、`IncreaseStockRequest`、`DecreaseStockRequest`、`AdjustStockRequest`、`ProductPresenterResponse` のように、UseCase の入口と Presenter の出口を名前で示す。
+
+これにより、将来 Vue 側を追加するときも、component や composable が最初から `type` の discriminated union と snake_case の HTTP key を使える。Pattern 3 の frontend は、Pattern 2 よりも「どのユースケースを呼ぶ payload か」を型名で読み取りやすくなる。

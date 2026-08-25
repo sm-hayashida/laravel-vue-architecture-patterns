@@ -78,3 +78,4 @@
 | Day 20 | 2026/05/28 | 完了 | Pattern 3 の UseCase / Interactor を操作単位で追加 |
 | Day 21 | 2026/06/12 | 完了 | Pattern 3 の Input / Output Port を追加 |
 | Day 22 | 2026/06/18 | 完了 | Pattern 3 の Controller / Presenter を追加 |
+| Day 23 | 2026/08/25 | 完了 | Pattern 3 の TypeScript API contract を追加 |

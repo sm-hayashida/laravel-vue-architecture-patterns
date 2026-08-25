@@ -126,3 +126,22 @@ ProductController
 Pattern 2 では、Controller が `ProductInventoryService` を呼び、返された `Product` を JSON に整形していた。これは Onion として十分に薄い Controller だが、出力変換はまだ Controller にある。
 
 Pattern 3 では、入力変換は Controller、ユースケースの流れは Interactor、業務ルールは Entity、出力変換は Presenter という形に分けた。これにより「API の見せ方を変える変更」は Presenter に寄せやすくなり、UseCase / Entity に HTTP や JSON の都合が入りにくくなる。
+
+## Day 23: TypeScript contract で HTTP 境界を写す
+
+Day 23 では、Pattern 3 の `ProductController` と `ProductPresenter` が作る HTTP 境界を TypeScript の型として追加した。
+
+```text
+ProductController
+  -> CreateProductRequest
+  -> StockOperationRequest
+
+ProductPresenter
+  -> ProductPresenterResponse
+```
+
+ここでの TypeScript は PHP から自動生成した schema ではない。Day 22 の Laravel validation と Presenter の JSON shape を、frontend consumer が参照できる contract として写している。
+
+Pattern 2 では、Composable と API module が扱いやすいように `CreateProductPayload` や `UpdateStockPayload` という汎用的な API DTO を置いた。Pattern 3 では Clean Architecture の意図に合わせて、`IncreaseStockRequest`、`DecreaseStockRequest`、`AdjustStockRequest` のように操作名を型名に出す。
+
+`StockOperationRequest` は `type` を discriminant にした union なので、`in`、`out`、`adjustment` の組み合わせを TypeScript が静的に確認できる。成功レスポンスは `ProductPresenterResponse` として表し、Presenter が返す `data` envelope と `id: number | null` をそのまま持つ。

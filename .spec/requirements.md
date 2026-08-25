@@ -372,3 +372,29 @@
 - Presenter implements `ProductOutputPort` and owns the API response data shape.
 - Interactors, UseCases, and Entities remain independent from Laravel HTTP classes.
 - Documentation explains why Presenter exists in Pattern 3 and how it differs from Pattern 2.
+
+## Day 23: Pattern 3 TypeScript API Contracts
+
+### Purpose
+- Add an explicit TypeScript representation of the Day 22 Pattern 3 HTTP boundary.
+- Make Pattern 3's frontend-facing contract reflect use-case-oriented Input boundary names and Presenter-owned Output shape.
+- Contrast Pattern 3 with Pattern 2's smaller generic API DTOs around the Vue composable.
+
+### Scope
+- Add TypeScript product contract types under `pattern3-clean/resources/js/contracts/`.
+- Add compile-time contract fixtures under `pattern3-clean/tests/types/`.
+- Add minimal TypeScript tooling for strict `tsc --noEmit` verification.
+- Update Pattern 3 README, Clean Architecture docs, Vue responsibility docs, and progress tracking.
+
+### Out Of Scope
+- Vue components, composables, or HTTP client modules.
+- PHP runtime behavior, routes, dependency injection, repositories, or Presenter behavior changes.
+- Error, retry, authorization, persistence, OpenAPI, schema generation, or PHP-to-TypeScript generation.
+
+### Acceptance Criteria
+- `POST /products` request keys are represented as `sku`, `name`, `stock_quantity`, and `price_amount_in_cents`.
+- `POST /products/{productId}/stock` request keys are represented as `type`, `quantity`, and `operator_role` for every stock operation.
+- Stock operations are represented as a discriminated union on `type` with `in`, `out`, and `adjustment`.
+- Presenter success output is represented with a `data` envelope and nullable `id`.
+- TypeScript rejects invalid literal combinations through compile-time fixtures.
+- Documentation states that these contracts mirror the current JSON boundary and are not generated from PHP.

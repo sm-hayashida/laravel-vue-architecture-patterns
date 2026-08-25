@@ -157,6 +157,28 @@ Pattern 3 では、UseCase は `ProductOutputData` を `ProductOutputPort` に�
 
 Day 22 時点では Laravel の DI binding はまだ追加していません。実際に HTTP 経由で動かす段階では、Interactor が使う `ProductOutputPort` と Controller が response を取り出す `ProductPresenter` が同じ request scope のインスタンスになるように wiring する必要があります。
 
+## Day 23: TypeScript API Contract
+
+Day 23 では、Day 22 で作った HTTP 境界を TypeScript の型として表現しました。
+
+```text
+resources/js/contracts/
+└── product.ts
+
+tests/types/
+└── product-contract.test.ts
+```
+
+`CreateProductRequest` は `POST /products` の request shape を表します。`IncreaseStockRequest`、`DecreaseStockRequest`、`AdjustStockRequest` は `POST /products/{productId}/stock` の use case ごとの request shape を表し、`StockOperationRequest` は `type` を discriminant にした union です。
+
+`ProductPresenterResponse` は `ProductPresenter` が返す成功レスポンスの `data` envelope を表します。`id` は `ProductOutputData` と Presenter の current shape に合わせて `number | null` としています。
+
+### Pattern 2 との違い
+
+Pattern 2 の TypeScript type は、Composable と API module が共有する小さな DTO として `Product`、`CreateProductPayload`、`UpdateStockPayload` を定義しました。
+
+Pattern 3 では、同じ HTTP boundary をそのまま緩い payload として置くのではなく、Clean Architecture の Input / Output boundary に合わせて `IncreaseStockRequest` や `ProductPresenterResponse` のように操作と Presenter を名前に出します。これは PHP から TypeScript を自動生成する仕組みではなく、現在の JSON contract を consumer 側で厳格に写したものです。
+
 ## 次のステップ
 
-- Day 23: TypeScript による厳格な型定義共有。
+- Day 24: モックを使用した高速なテスト実装。

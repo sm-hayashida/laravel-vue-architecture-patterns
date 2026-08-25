@@ -587,3 +587,46 @@ pattern3-clean/app/
 - Search Pattern 3 UseCases and Entities for Laravel HTTP / Controller / Presenter imports.
 - Confirm Controller does not import `App\Entities\Product`.
 - Confirm the remaining runtime DI wiring gap is documented as non-scope.
+
+## Day 23: Pattern 3 TypeScript API Contracts
+
+### TypeScript Boundary
+- Keep TypeScript under the Clean pattern only: `pattern3-clean/resources/js/contracts/`.
+- Model the existing Day 22 HTTP boundary without changing PHP runtime behavior.
+- Preserve snake_case at the HTTP boundary.
+- Treat the file as a consumer-side mirror, not as generated PHP metadata.
+
+### Contract Shape
+- `CreateProductRequest`:
+  - `sku`
+  - `name`
+  - `stock_quantity`
+  - `price_amount_in_cents`
+- `IncreaseStockRequest`:
+  - `type: 'in'`
+  - `quantity`
+  - `operator_role`
+- `DecreaseStockRequest`:
+  - `type: 'out'`
+  - `quantity`
+  - `operator_role`
+- `AdjustStockRequest`:
+  - `type: 'adjustment'`
+  - `quantity`
+  - `operator_role`
+- `StockOperationRequest`:
+  - union of the three stock operation requests, discriminated by `type`.
+- `ProductPresenterResponse`:
+  - `data.id` is `number | null`.
+  - `data.sku`, `data.name`, `data.stock_quantity`, and `data.price_amount_in_cents` match `ProductPresenter`.
+
+### MVC / Onion / Clean Comparison Note
+- Pattern 1 MVC keeps frontend API usage inline and does not introduce shared TypeScript contracts.
+- Pattern 2 Onion uses concise API DTOs around its API module and composable, such as create and update payloads.
+- Pattern 3 Clean makes the operation names visible in the TypeScript boundary, mirroring Input Port and Presenter responsibilities.
+
+### Verification
+- Run the pinned local TypeScript install for `pattern3-clean`.
+- Run `npm --prefix pattern3-clean run typecheck`.
+- Run `git diff --check`.
+- Confirm changed paths are within Day 23 scope and no PHP files changed.
