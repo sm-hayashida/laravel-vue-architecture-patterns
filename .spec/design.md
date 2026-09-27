@@ -701,3 +701,21 @@ pattern3-clean/app/
 - Inspect `git diff --name-only` and confirm all changed files are in the allowed Day 25 documentation list.
 - Search updated documentation for the required comparison terms and Pattern 3 runtime gap.
 - Confirm no files under `pattern1-mvc/`, `pattern2-onion/`, `pattern3-clean/app/`, `pattern3-clean/resources/`, or `pattern3-clean/tests/` changed.
+
+## Day 26: Final README And Learning Summary
+
+### Documentation Boundary
+- Keep the final comparison in the root README and record completion only in the four `.spec` files.
+- Do not change source code, tests, runtime wiring, or the canonical Day 25 comparison.
+
+### Responsibility Comparison
+- Laravel Standard MVC keeps Eloquent Model, Controller, and Vue responsibilities near Laravel's defaults; it optimizes for a short path from HTTP to persistence.
+- Onion Architecture + DDD puts invariants and repository contracts in the Domain, groups workflow in `ProductInventoryService`, and makes Infrastructure depend inward.
+- Clean Architecture + DDD keeps Entity rules inside, expresses each workflow through an Interactor, and makes Input Port, Output Port, and Presenter ownership explicit.
+
+### Evidence Boundary
+- State that Pattern 3 has UseCase-boundary evidence from Interactor unit tests with Repository and Output Port mocks.
+- State that no Eloquent repository implementation, Laravel DI wiring, API routes, or HTTP-to-DB integration proof exists for Pattern 3.
+
+### Verification
+- Run documentation-only diff, allowed-path, required-wording, and Day 25 document-existence checks.

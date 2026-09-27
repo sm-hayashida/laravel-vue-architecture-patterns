@@ -452,3 +452,23 @@
 - The comparison states that class names, Interactor count, DI, and interfaces alone do not define Onion or Clean, and that Onion converges with Clean when explicit use-case input/output boundaries are added.
 - The comparison accurately states that Pattern 3 still lacks Eloquent repository implementation, Laravel DI wiring, routes, and HTTP-to-DB integration proof.
 - Day 25 is marked complete with date `2026/08/25`.
+
+## Day 26: Final README And Learning Summary
+
+### Purpose
+- Complete the learning comparison by making the final README explain the same inventory-management subject through Laravel Standard MVC, Onion Architecture + DDD, and Clean Architecture + DDD.
+- Preserve the verified boundary: Pattern 3 is proven through its UseCase boundary, not through HTTP-to-DB runtime integration.
+
+### Scope
+- Update only the root README and the Day 26 records in requirements, design, tasks, and learning roadmap.
+- Summarize responsibility placement, dependency direction, benefits, costs, and suitable situations for all three patterns.
+
+### Out Of Scope
+- Runtime code, tests, dependencies, routes, DI wiring, Eloquent repositories, and HTTP-to-DB integration.
+- Changes to the existing Day 1 through Day 25 history or to `docs/08_onion-vs-clean.md`.
+
+### Acceptance Criteria
+- README identifies the shared inventory-management subject and all three official pattern names.
+- README accurately summarizes the responsibility and dependency differences recorded in the Pattern READMEs and Day 25 comparison.
+- README explicitly states that Pattern 3 lacks an Eloquent repository implementation, Laravel DI wiring, API routes, and HTTP-to-DB integration proof.
+- Day 26 is consistently recorded as complete on `2026/09/14`.

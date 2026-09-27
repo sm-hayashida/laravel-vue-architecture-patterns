@@ -49,7 +49,7 @@
 | Day 23 | TypeScriptによる厳格な型定義共有 |
 | Day 24 | モックを使用した高速なテスト実装 |
 | Day 25 | Onion vs Clean の構造的差異をまとめる |
-| Day 26 | 全体振り返り・最終READMEの完成 |
+| Day 26 | 完了: 全体振り返り・最終READMEの完成 |
 
 ## 進捗ログ
 
@@ -81,3 +81,4 @@
 | Day 23 | 2026/08/25 | 完了 | Pattern 3 の TypeScript API contract を追加 |
 | Day 24 | 2026/08/25 | 完了 | Pattern 3 の Interactor を PHPUnit mock ports で直接テスト |
 | Day 25 | 2026/08/25 | 完了 | Onion + DDD と Clean + DDD の構造的差異を現在のコードで比較 |
+| Day 26 | 2026/09/14 | 完了 | 3方式の責務配置・依存方向・トレードオフと Pattern 3 の未接続 runtime 境界を最終READMEに整理 |
