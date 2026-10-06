@@ -3,6 +3,7 @@ import type {
     CreateProductRequest,
     DecreaseStockRequest,
     IncreaseStockRequest,
+    ProductListPresenterResponse,
     ProductPresenterResponse,
     StockOperationRequest,
 } from '../../resources/js/contracts/product';
@@ -48,6 +49,10 @@ const productPresenterResponse = {
     },
 } satisfies ProductPresenterResponse;
 
+const productListPresenterResponse = {
+    data: [productPresenterResponse.data],
+} satisfies ProductListPresenterResponse;
+
 const invalidIncreaseRequest = {
     // @ts-expect-error type discriminates increase stock requests.
     type: 'out',
@@ -81,6 +86,7 @@ const invalidPresenterResponse = {
 
 void stockOperationRequests;
 void productPresenterResponse;
+void productListPresenterResponse;
 void invalidIncreaseRequest;
 void invalidAdjustmentRole;
 void invalidOperatorRoleKey;

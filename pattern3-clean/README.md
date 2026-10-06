@@ -171,7 +171,7 @@ tests/types/
 
 `CreateProductRequest` は `POST /products` の request shape を表します。`IncreaseStockRequest`、`DecreaseStockRequest`、`AdjustStockRequest` は `POST /products/{productId}/stock` の use case ごとの request shape を表し、`StockOperationRequest` は `type` を discriminant にした union です。
 
-`ProductPresenterResponse` は `ProductPresenter` が返す成功レスポンスの `data` envelope を表します。`id` は `ProductOutputData` と Presenter の current shape に合わせて `number | null` としています。
+`ProductPresenterResponse` は単品の成功レスポンス、`ProductListPresenterResponse` は商品一覧の成功レスポンスの `data` envelope を表します。`id` は `ProductOutputData` と Presenter の current shape に合わせて `number | null` としています。
 
 ### Pattern 2 との違い
 
@@ -216,7 +216,31 @@ Day 25 では、Pattern 2 Onion + DDD と Pattern 3 Clean + DDD の違いを `do
 
 この Pattern 3 では、Pattern 2 の `ProductInventoryService` に相当する操作を `CreateProductInteractor`、`IncreaseStockInteractor`、`DecreaseStockInteractor`、`AdjustStockInteractor` に分けています。Controller は `CreateProductInputPort` などの Input Port を呼び、Interactor は `ProductOutputData` を `ProductOutputPort` に渡し、`ProductPresenter` が JSON response shape を持ちます。
 
-一方で、現時点では Eloquent repository 実装、Laravel DI wiring、routes、HTTP から DB までを通す integration proof はまだありません。Pattern 3 の現在の検証範囲は、Interactor を Repository / Output Port mock で直接確認する UseCase 境界までです。
+Day 25 時点では Eloquent repository 実装、Laravel DI wiring、routes、HTTP から DB までを通す integration proof はありませんでした。これらは後述の API 実行構成で追加しました。
+
+## 商品 API を動かす
+
+PHP 8.2 以上、Composer、PHP の SQLite 拡張が必要です。`pattern3-clean/` で次を実行します。
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate
+php artisan serve
+```
+
+別のターミナルから `GET /api/products`、`POST /api/products`、`POST /api/products/{productId}/stock` を呼べます。登録時の JSON は `sku`、`name`、`stock_quantity`、`price_amount_in_cents` です。在庫更新時の JSON は `type`（`in` / `out` / `adjustment`）、`quantity`、`operator_role`（`staff` / `manager`）です。直接調整は `manager` のみ可能です。
+
+```bash
+php artisan route:list --path=api
+./vendor/bin/phpunit
+```
+
+`routes/api.php` を `RouteServiceProvider` が `/api` プレフィックス付きで読み込みます。Controller が Input Port を呼ぶと、`AppServiceProvider` の binding により Interactor が選ばれます。Interactor は Repository Gateway を通して Eloquent Repository に保存し、結果を Output Port に渡します。Output Port と Controller が受け取る `ProductPresenter` は request scope で同じインスタンスです。商品一覧には一覧用の Input / Output Port を用います。
+
+HTTP の Feature Test は SQLite のインメモリ DB を使い、一覧、登録、在庫の入出庫・直接調整、失敗時の非更新を確認します。Vue 画面は接続していません。
 
 ## 次のステップ
 

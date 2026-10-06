@@ -42,11 +42,11 @@ Onion の実装では `ProductInventoryService` が `Product` を返し、Contro
 
 Onion と Clean の分け方は、このリポジトリで採った一例です。Onion でも操作ごとにクラスを分けたり、入力と出力のインターフェースを用意したりできます。クラス名や数だけで分類するより、何を分けるためにその構成を選んだのかを説明できるようにしたいです。
 
-## まだできていないこと
+## 現在の実行範囲
 
-Pattern 3 は、Entity、UseCase、Input/Output Port、Controller、Presenter と、TypeScript 側のデータ型まで用意しています。単体テストでは Repository と Output Port をモックに置き換えて、Interactor の処理を確認する構成です。
+Pattern 3 は、Entity、UseCase、Input/Output Port、Controller、Presenter、Eloquent Repository、Laravel のルートと DI 設定を備えています。単体テストでは Repository と Output Port をモックに置き換え、Feature Test では HTTP から SQLite への保存まで確認します。
 
-ただし、Eloquent を使う Repository の実装、Laravel の DI 設定、API ルートはまだありません。HTTP リクエストを受けて DB に保存するまでを通した結合テストも未実装です。現時点では、3つとも同じように動かせる完成品としては比較できません。Pattern 3 について比較できるのは主にコードの構造と UseCase の単体テストです。
+Pattern 3 の商品一覧・登録・在庫更新は API として実行できます。Vue 画面はまだ接続していないため、画面込みの動作比較ではなく、API と責務配置の比較です。起動手順は [Pattern 3 の README](pattern3-clean/README.md) にあります。
 
 ## プロジェクト構成
 
@@ -69,4 +69,4 @@ Pattern 3 は、Entity、UseCase、Input/Output Port、Controller、Presenter �
 - Docker (Laravel Sail)
 
 ---
-*本プロジェクトは社内昇格評価用ポートフォリオとして作成されています。*
+*本プロジェクトは社内能力行動評価用ポートフォリオとして作成されています。*

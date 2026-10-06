@@ -15,9 +15,9 @@ Pattern 2 Onion + DDD と Pattern 3 Clean + DDD は、どちらも在庫管理�
 
 | 観点 | Pattern 2 Onion + DDD | Pattern 3 Clean + DDD |
 | --- | --- | --- |
-| アプリケーション操作 | `ProductInventoryService` が商品作成、入庫、出庫、直接調整をメソッドとして持つ | `CreateProductInteractor`、`IncreaseStockInteractor`、`DecreaseStockInteractor`、`AdjustStockInteractor` に分ける |
+| アプリケーション操作 | `ProductInventoryService` が商品一覧、作成、入庫、出庫、直接調整をメソッドとして持つ | 一覧、作成、入庫、出庫、直接調整をそれぞれの Interactor に分ける |
 | 入力境界 | Controller が Application Service を直接呼ぶ。入口は実装上は暗黙的 | Controller が `CreateProductInputPort` などの Input Port を呼ぶ |
-| 出力境界 | `ProductInventoryService` が Domain `Product` を返し、Controller が JSON へ整形する | Interactor が `ProductOutputData` を `ProductOutputPort` へ渡し、`ProductPresenter` が JSON へ整形する |
+| 出力境界 | `ProductInventoryService` が Domain `Product` を返し、Controller が JSON へ整形する | Interactor が `ProductOutputData` を単品または一覧の Output Port へ渡し、`ProductPresenter` が JSON へ整形する |
 | テスト境界 | `ProductInventoryServiceTest` が `InMemoryProductRepository` で永続化を差し替える | `ProductInteractorsTest` が Repository と Output Port を PHPUnit mock に差し替える |
 | 見え方 | Domain を中心に、周囲の Application / Infrastructure が支える | UseCase の入力と出力を前面に出し、操作単位が見えやすい |
 
@@ -41,11 +41,12 @@ Pattern 3 は、Controller が操作ごとの Input Port に入力を渡す。In
 ```text
 HTTP Request
   -> ProductController
-      -> CreateProductInputPort / IncreaseStockInputPort / DecreaseStockInputPort / AdjustStockInputPort
-          <- CreateProductInteractor / IncreaseStockInteractor / DecreaseStockInteractor / AdjustStockInteractor
+      -> ListProductsInputPort / CreateProductInputPort / 在庫操作の Input Port
+          <- ListProductsInteractor / CreateProductInteractor / 在庫操作の Interactor
               -> ProductRepositoryInterface
+                  <- EloquentProductRepository
               -> Product
-              -> ProductOutputPort
+              -> ProductOutputPort / ProductListOutputPort
                   <- ProductPresenter
   <- ProductController が ProductPresenter の JSON response を返す
 ```
@@ -58,18 +59,13 @@ HTTP Request
 
 つまり重要なのは名前ではなく、依存方向、業務ルールの置き場所、入力と出力の所有者をコードでどう表しているかです。
 
-## 現在の Pattern 3 のランタイム上の未接続部分
+## 現在の Pattern 3 の実行範囲
 
-Pattern 3 は UseCase / Entity / Controller / Presenter / TypeScript contract / Interactor unit test までを追加していますが、現時点では HTTP から DB まで動く証明はまだありません。
+Pattern 3 は Laravel の `routes/api.php` から Controller を呼び出し、`AppServiceProvider` が Input Port と Interactor、Repository Gateway と Eloquent 実装、Output Port と Presenter を結びます。Presenter は request scope で共有され、Interactor が渡した結果を Controller が同じインスタンスから返します。
 
-未実装のものは次の通りです。
+商品一覧・登録・在庫更新は HTTP から SQLite まで動き、Feature Test で永続化とレスポンスを確認しています。単体テストでは Repository と Output Port をモックに置き換えて、UseCase 境界を独立して確認します。
 
-- Eloquent repository の具象実装。
-- Laravel DI wiring。
-- API routes。
-- HTTP request から Eloquent DB 保存までを通す integration proof。
-
-そのため Pattern 3 の現在の証明範囲は、Interactor を Repository / Output Port mock で直接動かす UseCase 境界までです。
+Vue 画面との接続はこの範囲に含めていません。
 
 ## 使い分け
 

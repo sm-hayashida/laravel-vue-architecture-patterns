@@ -5,19 +5,27 @@ declare(strict_types=1);
 namespace App\InterfaceAdapters\Presenters;
 
 use App\UseCases\Products\Outputs\ProductOutputData;
+use App\UseCases\Products\Ports\Output\ProductListOutputPort;
 use App\UseCases\Products\Ports\Output\ProductOutputPort;
 use Illuminate\Http\JsonResponse;
 
-final class ProductPresenter implements ProductOutputPort
+final class ProductPresenter implements ProductOutputPort, ProductListOutputPort
 {
-    /**
-     * @var array{id: int|null, sku: string, name: string, stock_quantity: int, price_amount_in_cents: int}|null
-     */
-    private ?array $product = null;
+    private array $data = [];
 
     public function present(ProductOutputData $output): void
     {
-        $this->product = [
+        $this->data = $this->formatProduct($output);
+    }
+
+    public function presentList(array $products): void
+    {
+        $this->data = array_map($this->formatProduct(...), $products);
+    }
+
+    private function formatProduct(ProductOutputData $output): array
+    {
+        return [
             'id' => $output->id,
             'sku' => $output->sku,
             'name' => $output->name,
@@ -29,7 +37,7 @@ final class ProductPresenter implements ProductOutputPort
     public function jsonResponse(int $status = 200): JsonResponse
     {
         return response()->json([
-            'data' => $this->product,
+            'data' => $this->data,
         ], $status);
     }
 }

@@ -22,6 +22,7 @@ use App\UseCases\Products\Ports\Input\AdjustStockInputPort;
 use App\UseCases\Products\Ports\Input\CreateProductInputPort;
 use App\UseCases\Products\Ports\Input\DecreaseStockInputPort;
 use App\UseCases\Products\Ports\Input\IncreaseStockInputPort;
+use App\UseCases\Products\Ports\Input\ListProductsInputPort;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -35,8 +36,16 @@ final class ProductController extends Controller
         private readonly IncreaseStockInputPort $increaseStock,
         private readonly DecreaseStockInputPort $decreaseStock,
         private readonly AdjustStockInputPort $adjustStock,
+        private readonly ListProductsInputPort $listProducts,
         private readonly ProductPresenter $presenter,
     ) {
+    }
+
+    public function index(): JsonResponse
+    {
+        $this->listProducts->execute();
+
+        return $this->presenter->jsonResponse();
     }
 
     public function store(Request $request): JsonResponse

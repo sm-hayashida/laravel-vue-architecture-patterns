@@ -43,3 +43,7 @@ export interface ProductPresenterData {
 export interface ProductPresenterResponse {
     data: ProductPresenterData;
 }
+
+export interface ProductListPresenterResponse {
+    data: ProductPresenterData[];
+}

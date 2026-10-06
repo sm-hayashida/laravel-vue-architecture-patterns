@@ -10,6 +10,9 @@ use App\Entities\ValueObjects\Sku;
 
 interface ProductRepositoryInterface
 {
+    /** @return list<Product> */
+    public function findAll(): array;
+
     public function findById(ProductId $id): ?Product;
 
     public function existsBySku(Sku $sku): bool;
