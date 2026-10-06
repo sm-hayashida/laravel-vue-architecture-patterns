@@ -69,4 +69,4 @@ Pattern 3 は、Entity、UseCase、Input/Output Port、Controller、Presenter �
 - Docker (Laravel Sail)
 
 ---
-*本プロジェクトは社内昇格評価用ポートフォリオとして作成されています。*
+*本プロジェクトは社内能力行動評価用ポートフォリオとして作成されています。*
